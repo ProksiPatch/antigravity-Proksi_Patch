@@ -17,6 +17,8 @@ Proksi_Patch_Setup.exe
 # Python кэш и временные файлы
 __pycache__/
 build/
+*nuitka*
+nuitka_setup_dist/
 *.py
 *.spec
 *.log
