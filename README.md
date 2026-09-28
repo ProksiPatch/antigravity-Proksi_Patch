@@ -6,12 +6,12 @@
 
 **Легковесный клиент маршрутизации и шлюз для Google Antigravity, YouTube и Telegram на Windows.**
 
-[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?logo=windows&logoColor=white)](https://github.com/root88888tr-creator/antigravity-Proksi_Patch)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?logo=windows&logoColor=white)](https://github.com/ProksiPatch/antigravity-Proksi_Patch)
 [![Telegram Channel](https://img.shields.io/badge/Telegram-@antigravity__proxy-2CA5E0?logo=telegram&logoColor=white)](https://t.me/antigravity_proxy)
 [![Core](https://img.shields.io/badge/Engine-Mihomo%20Core-00C7B7)](https://github.com/MetaCubeX/mihomo)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-[**Скачать релиз (Proksi_Patch_Setup.exe)**](https://github.com/root88888tr-creator/antigravity-Proksi_Patch/releases/latest) • [**Telegram-канал**](https://t.me/antigravity_proxy)
+[**Скачать релиз (Proksi_Patch_Setup.exe)**](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/latest) • [**Telegram-канал**](https://t.me/antigravity_proxy)
 
 </div>
 
@@ -52,7 +52,7 @@ graph LR
 
 ### Установка
 
-1. Скачайте актуальный бинарник [`Proksi_Patch_Setup.exe`](https://github.com/root88888tr-creator/antigravity-Proksi_Patch/releases/latest).
+1. Скачайте актуальный бинарник [`Proksi_Patch_Setup.exe`](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/latest).
 2. Запустите файл и выберите необходимые компоненты маршрутизации.
 3. Нажмите **«Установить и применить»**.
 4. Программа автоматически создаст рабочий профиль в `%APPDATA%\ProksiFi` и разместит иконку управления в системном трее возле часов.
