@@ -7,11 +7,13 @@
 **Легковесный клиент маршрутизации и шлюз для Google Antigravity, YouTube и Telegram на Windows.**
 
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?logo=windows&logoColor=white)](https://github.com/ProksiPatch/antigravity-Proksi_Patch)
+[![Version](https://img.shields.io/badge/Release-v1.1.6%20(October%202026)-success)](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/latest)
 [![Telegram Channel](https://img.shields.io/badge/Telegram-@antigravity__proxy-2CA5E0?logo=telegram&logoColor=white)](https://t.me/antigravity_proxy)
+[![Size](https://img.shields.io/badge/Size-25.2%20MB-blue)](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/latest)
 [![Core](https://img.shields.io/badge/Engine-Mihomo%20Core-00C7B7)](https://github.com/MetaCubeX/mihomo)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-[**Скачать релиз (Proksi_Patch_Setup.exe)**](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/latest) • [**Telegram-канал**](https://t.me/antigravity_proxy)
+[**⚡ Скачать ProksiFi_Setup_v1.1.6.exe (25 МБ)**](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/download/v1.1.6/ProksiFi_Setup_v1.1.6.exe) • [**Proksi_Patch_Setup.exe**](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/download/v1.1.6/Proksi_Patch_Setup.exe) • [**Telegram-канал**](https://t.me/antigravity_proxy)
 
 </div>
 
@@ -52,10 +54,9 @@ graph LR
 
 ### Установка
 
-1. Скачайте актуальный бинарник [`Proksi_Patch_Setup.exe`](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/latest).
-2. Запустите файл и выберите необходимые компоненты маршрутизации.
-3. Нажмите **«Установить и применить»**.
-4. Программа автоматически создаст рабочий профиль в `%APPDATA%\ProksiFi` и разместит иконку управления в системном трее возле часов.
+1. Скачайте официальный инсталлятор [**`ProksiFi_Setup_v1.1.6.exe`**](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/download/v1.1.6/ProksiFi_Setup_v1.1.6.exe) (или совместимый [`Proksi_Patch_Setup.exe`](https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/download/v1.1.6/Proksi_Patch_Setup.exe)).
+2. Запустите установщик (права администратора не требуются, установка идёт в пользовательский профиль `%APPDATA%\ProksiFi`).
+3. По завершении установки программа автоматически активирует маршрутизацию и разместит статусную иконку в системном трее Windows.
 
 ---
 
