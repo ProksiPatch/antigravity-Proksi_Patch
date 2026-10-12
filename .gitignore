@@ -1,0 +1,43 @@
+# Исходный код и служебные скрипты (скрыты из репозитория)
+installer/
+server/
+dist/
+*.zip
+config.json
+show_users.py
+tools/
+last_tg_post.json
+*.bat
+*.ico
+.env
+
+# Готовые бинарники — хранятся в GitHub Releases, не в git
+Proksi_Patch_Setup.exe
+ProksiFi_Setup*.exe
+
+# Python кэш и временные файлы
+__pycache__/
+build/
+*nuitka*
+nuitka_setup_dist/
+*.py
+*.spec
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Sensitive Master Passports & Internal Agent Memory
+*PASSPORT*
+*passport*
+*SECRET*
+*secret*
+*.key
+*.token
+PROJECT_MEMORY.md
+PROJECT_*_RESTORED.md
+AGENTS.md
+GEMINI.md
+topics.json
+.agents/
+.agent/

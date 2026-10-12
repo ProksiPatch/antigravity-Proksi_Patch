@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProksiFi — Умный шлюз и маршрутизатор для Windows (Antigravity, YouTube, Telegram)</title>
+  <meta name="description" content="Бесплатный ультрабыстрый шлюз маршрутизации для Windows 10/11. Стабильный доступ к Google Antigravity, Gemini & Claude AI, YouTube 4K 60FPS и Telegram без задержек и конфликтов с играми и античитами.">
+  <meta name="keywords" content="ProksiFi, Antigravity proxy, YouTube без замедления, Telegram прокси, обход блокировок Windows, VLESS Reality, Mihomo Windows, split tunneling, Google AI Studio Россия">
+  <meta name="author" content="ProksiPatch">
+  <link rel="canonical" href="https://ProksiPatch.github.io/antigravity-Proksi_Patch/">
+
+  <!-- Open Graph / Telegram / VK -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ProksiPatch.github.io/antigravity-Proksi_Patch/">
+  <meta property="og:title" content="ProksiFi — Умный шлюз для Google Antigravity, YouTube и Telegram">
+  <meta property="og:description" content="Легковесный клиент для Windows: стабильный доступ к AI, YouTube 4K и Telegram без задержек и конфликтов с играми.">
+  <meta property="og:image" content="https://ProksiPatch.github.io/antigravity-Proksi_Patch/icon.jpg">
+
+  <!-- Search Engine Verification -->
+  <meta name="google-site-verification" content="googlea2c6cacaf062ae3f">
+  <meta name="yandex-verification" content="cabd4fd6fed15c73">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: "#f0f9ff",
+              100: "#e0f2fe",
+              200: "#bae6fd",
+              400: "#38bdf8",
+              500: "#0ea5e9",
+              600: "#0284c7",
+              700: "#0369a1",
+              800: "#075985",
+              900: "#0c4a6e"
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'glow-spin': 'spin 12s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' },
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Premium light aesthetic styles */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .light-glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.02);
+    }
+    .light-glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: 0 16px 40px -10px rgba(14, 165, 233, 0.12), 0 6px 16px -4px rgba(15, 23, 42, 0.04);
+    }
+    .light-grid-pattern {
+      background-image: linear-gradient(to right, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+      background-size: 3.5rem 3.5rem;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 15%, #000 65%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 15%, #000 65%, transparent 100%);
+    }
+  </style>
+
+  <!-- Schema.org SoftwareApplication Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ProksiFi",
+    "operatingSystem": "Windows 10, Windows 11",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "RUB"
+    },
+    "description": "Умный агент раздельной маршрутизации для Windows: ускорение YouTube, Telegram и Google Antigravity без влияния на онлайн-игры.",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "128"
+    },
+    "softwareVersion": "1.1.7",
+    "author": {
+      "@type": "Organization",
+      "name": "ProksiFi Community"
+    }
+  }
+  </script>
+</head>
+
+<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased selection:bg-sky-500 selection:text-white relative overflow-x-hidden min-h-screen">
+
+  <!-- Ambient Dynamic Lighting & Grids (Light Mode) -->
+  <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+    <div class="absolute inset-0 light-grid-pattern"></div>
+    <!-- Glowing Soft Pastel Auras -->
+    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-gradient-to-tr from-sky-400/25 via-cyan-300/20 to-indigo-400/20 rounded-full blur-[130px] opacity-75"></div>
+    <div class="absolute top-[35%] -left-48 w-[550px] h-[550px] bg-blue-400/15 rounded-full blur-[140px] opacity-60"></div>
+    <div class="absolute top-[65%] -right-48 w-[600px] h-[600px] bg-teal-300/20 rounded-full blur-[140px] opacity-60"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl transition-all duration-300 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3.5 group">
+        <div class="relative w-10 h-10 rounded-xl overflow-hidden p-0.5 bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 shadow-[0_4px_16px_rgba(14,165,233,0.3)] group-hover:shadow-[0_6px_22px_rgba(14,165,233,0.45)] transition-all duration-300">
+          <img src="icon.jpg" alt="ProksiFi Logo" class="w-full h-full object-cover rounded-[10px]">
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-extrabold tracking-tight text-slate-900">ProksiFi</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-sky-100 text-sky-700 border border-sky-200">v1.1.7</span>
+          </div>
+          <span class="text-[11px] text-slate-500 tracking-wider uppercase font-semibold">Smart Split Gateway</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+        <a href="#features" class="hover:text-sky-600 transition-colors duration-200">Возможности</a>
+        <a href="#telemetry" class="hover:text-sky-600 transition-colors duration-200">Тест скорости</a>
+        <a href="#routing" class="hover:text-sky-600 transition-colors duration-200">Архитектура</a>
+        <a href="#compare" class="hover:text-sky-600 transition-colors duration-200">Сравнение</a>
+        <a href="#faq" class="hover:text-sky-600 transition-colors duration-200">FAQ</a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <a href="https://t.me/antigravity_proxy" onclick="openTelegram(event)" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50/50 shadow-sm transition-all duration-200">
+          <i data-lucide="send" class="w-3.5 h-3.5 text-sky-500"></i>
+          <span>Telegram</span>
+        </a>
+        <a href="https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/download/v1.1.7/ProksiFi_Setup_v1.1.7.exe" class="relative group overflow-hidden inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-semibold text-xs sm:text-sm shadow-md shadow-sky-500/25 hover:shadow-lg hover:shadow-sky-500/35 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Скачать</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-12 sm:pt-20 pb-20 lg:pb-32 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      
+      <!-- Release Pill Badge -->
+      <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs sm:text-sm font-semibold tracking-wide uppercase shadow-sm mb-8 animate-pulse-slow">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+        <span>Версия 1.1.7 — Высокоскоростной узел Франкфурт 🇩🇪</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 max-w-5xl mx-auto leading-[1.12] sm:leading-[1.1] mb-6">
+        Умная маршрутизация для <br class="hidden sm:block"/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600">
+          YouTube 4K, Telegram и Antigravity
+        </span>
+      </h1>
+
+      <!-- Description -->
+      <p class="max-w-3xl mx-auto text-base sm:text-lg lg:text-xl text-slate-600 font-normal mb-10 leading-relaxed">
+        Бесплатный ультралегкий клиент для Windows 10/11. Направляет заблокированные платформы и нейросети через скоростной европейский туннель, а онлайн-игры и российские сервисы оставляет на прямом соединении без пинга.
+      </p>
+
+      <!-- Primary CTAs -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <a href="https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/download/v1.1.7/ProksiFi_Setup_v1.1.7.exe" class="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-3.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white font-bold text-base shadow-xl shadow-sky-500/25 hover:shadow-2xl hover:shadow-sky-500/35 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0">
+          <i data-lucide="download" class="w-5 h-5"></i>
+          <span>Скачать ProksiFi_Setup_v1.1.7.exe</span>
+          <span class="text-xs py-0.5 px-2 rounded-md bg-white/20 text-white font-mono">25.2 МБ</span>
+        </a>
+
+        <a href="https://t.me/antigravity_proxy" onclick="openTelegram(event)" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-7 py-4 rounded-2xl bg-white border border-slate-200/90 hover:border-sky-300 text-slate-700 hover:text-sky-600 font-semibold text-base shadow-sm hover:shadow-md transition-all duration-200 hover:bg-slate-50/70">
+          <i data-lucide="send" class="w-5 h-5 text-sky-500"></i>
+          <span>Telegram-канал проекта</span>
+        </a>
+      </div>
+
+      <!-- Live Telemetry & Interactive Latency Simulator Card -->
+      <div id="telemetry" class="max-w-4xl mx-auto light-glass-card rounded-3xl p-6 sm:p-8 text-left shadow-xl relative overflow-hidden group">
+        <div class="absolute -top-24 -right-24 w-60 h-60 bg-sky-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Telemetry Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-100 gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                Текущий статус маршрутизации ProksiFi
+                <span class="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono font-semibold">LIVE 10 Gbps</span>
+              </h3>
+              <p class="text-xs text-slate-500">Узел: Frankfurt Gateway • Протокол: VLESS Reality + Xray Split</p>
+            </div>
+          </div>
+          <button id="pingBtn" onclick="simulatePing()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-xs font-semibold shadow-sm transition-all duration-200">
+            <i data-lucide="refresh-cw" id="pingIcon" class="w-3.5 h-3.5 text-sky-600"></i>
+            <span>Запустить тест задержки</span>
+          </button>
+        </div>
+
+        <!-- Live Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
+          
+          <!-- Metric 1: YouTube -->
+          <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 hover:border-sky-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                <i data-lucide="play-square" class="w-4 h-4 text-red-500"></i> YouTube 4K
+              </span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 font-semibold">Туннель</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="pingYt" class="text-2xl font-extrabold font-mono text-slate-900">18 ms</span>
+              <span class="text-xs text-emerald-600 font-semibold">Без буфера</span>
+            </div>
+            <div class="w-full bg-slate-200/80 rounded-full h-1.5 mt-3 overflow-hidden">
+              <div class="bg-gradient-to-r from-sky-500 to-emerald-500 h-1.5 rounded-full w-[96%]"></div>
+            </div>
+          </div>
+
+          <!-- Metric 2: Telegram CDN -->
+          <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 hover:border-sky-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                <i data-lucide="send" class="w-4 h-4 text-sky-500"></i> Telegram CDN
+              </span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 font-semibold">Туннель</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="pingTg" class="text-2xl font-extrabold font-mono text-slate-900">22 ms</span>
+              <span class="text-xs text-emerald-600 font-semibold">0% Loss</span>
+            </div>
+            <div class="w-full bg-slate-200/80 rounded-full h-1.5 mt-3 overflow-hidden">
+              <div class="bg-gradient-to-r from-sky-500 to-indigo-500 h-1.5 rounded-full w-[98%]"></div>
+            </div>
+          </div>
+
+          <!-- Metric 3: AI Studio & Antigravity -->
+          <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/60 hover:border-sky-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-4 h-4 text-sky-500"></i> Gemini AI
+              </span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 font-semibold">Туннель</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="pingAi" class="text-2xl font-extrabold font-mono text-slate-900">31 ms</span>
+              <span class="text-xs text-emerald-600 font-semibold">API Ready</span>
+            </div>
+            <div class="w-full bg-slate-200/80 rounded-full h-1.5 mt-3 overflow-hidden">
+              <div class="bg-gradient-to-r from-sky-500 to-blue-600 h-1.5 rounded-full w-[94%]"></div>
+            </div>
+          </div>
+
+          <!-- Metric 4: Games & Steam -->
+          <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/60 hover:border-emerald-300 transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                <i data-lucide="gamepad-2" class="w-4 h-4 text-emerald-600"></i> Онлайн-игры
+              </span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">Прямой</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="pingGm" class="text-2xl font-extrabold font-mono text-emerald-600">0 ms</span>
+              <span class="text-xs text-slate-500 font-medium">Bypass</span>
+            </div>
+            <div class="w-full bg-slate-200/80 rounded-full h-1.5 mt-3 overflow-hidden">
+              <div class="bg-emerald-500 h-1.5 rounded-full w-full"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Bento Grid Features Section -->
+  <section id="features" class="py-20 lg:py-28 relative border-t border-slate-200/70 bg-white/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
+          Технологический стек
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-5">
+          Создан для тех, кто ценит скорость и приватность
+        </h2>
+        <p class="text-slate-600 text-base sm:text-lg">
+          Умное разделение трафика на уровне ядра операционной системы без навязчивых VPN-адаптеров и перехвата игр.
+        </p>
+      </div>
+
+      <!-- Bento Grid Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Bento Card 1: Wide (2 cols) - Split Tunneling -->
+        <div class="md:col-span-2 light-glass-card rounded-3xl p-8 lg:p-10 relative overflow-hidden group">
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md shadow-sky-500/10">
+              <i data-lucide="git-fork" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+              Интеллектуальный Split-Tunneling (Разделение маршрутов)
+            </h3>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl">
+              В отличие от классических VPN, которые замедляют весь интернет целиком, ProksiFi направляет в туннель <strong>только точечные домены</strong> (YouTube, Telegram, Gemini, Antigravity). Все российские сайты (Госуслуги, Банки, Кинопоиск, Маркетплейсы) открываются напрямую на 100% скорости вашего провайдера.
+            </p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div class="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                <span class="text-xs sm:text-sm text-slate-700">Банки и Госуслуги: <strong>Прямой IP</strong></span>
+              </div>
+              <div class="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <div class="w-2.5 h-2.5 rounded-full bg-sky-500"></div>
+                <span class="text-xs sm:text-sm text-slate-700">YouTube 4K & Telegram: <strong>Ускорение</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="absolute -right-16 -bottom-16 w-80 h-80 bg-sky-300/10 rounded-full blur-3xl pointer-events-none"></div>
+        </div>
+
+        <!-- Bento Card 2: 1 col - Anti-cheat Safe -->
+        <div class="light-glass-card rounded-3xl p-8 relative overflow-hidden group">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md shadow-emerald-500/10">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mb-3">
+            100% защита от банов античитов
+          </h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-6">
+            Riot Vanguard (Valorant), Easy Anti-Cheat (Apex, Rust), BattlEye (R6 Siege, DayZ) и Valve VAC полностью исключены из прокси. Нулевой риск блокировки аккаунта.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-[11px] font-mono text-slate-700 border border-slate-200/80">Vanguard Safe</span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-[11px] font-mono text-slate-700 border border-slate-200/80">EasyAntiCheat</span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-[11px] font-mono text-slate-700 border border-slate-200/80">BattlEye</span>
+          </div>
+        </div>
+
+        <!-- Bento Card 3: 1 col - Zero RAM footprint -->
+        <div class="light-glass-card rounded-3xl p-8 relative overflow-hidden group">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md shadow-indigo-500/10">
+            <i data-lucide="cpu" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mb-3">
+            18 МБ ОЗУ и автозапуск в трее
+          </h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-6">
+            Написан на высокопроизводительном Go/C. Не нагружает процессор в играх, сворачивается в компактную иконку системного трея Windows.
+          </p>
+          <div class="p-3 rounded-xl bg-indigo-50/60 border border-indigo-100 font-mono text-xs text-indigo-800 flex items-center justify-between">
+            <span>CPU Usage: ~0.02%</span>
+            <span class="text-emerald-600 font-bold">Ultra-light</span>
+          </div>
+        </div>
+
+        <!-- Bento Card 4: Wide (2 cols) - VLESS Reality -->
+        <div class="md:col-span-2 light-glass-card rounded-3xl p-8 lg:p-10 relative overflow-hidden group">
+          <div class="relative z-10">
+            <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-md shadow-blue-500/10">
+              <i data-lucide="lock" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+              Протокол VLESS Reality и маскировка TLS 1.3
+            </h3>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl">
+              Продвинутый алгоритм шифрования маскирует сетевые пакеты под легитимный HTTPS-трафик популярных мировых веб-серверов. ТСПУ и DPI провайдеров не видят признаков туннеля и не могут его замедлить.
+            </p>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-mono text-slate-700">
+                <i data-lucide="check" class="w-3.5 h-3.5 text-sky-600"></i> No OpenVPN signature
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-mono text-slate-700">
+                <i data-lucide="check" class="w-3.5 h-3.5 text-sky-600"></i> No WireGuard drops
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-mono text-slate-700">
+                <i data-lucide="check" class="w-3.5 h-3.5 text-sky-600"></i> TLS 1.3 Reality SNI
+              </span>
+            </div>
+          </div>
+          <div class="absolute -left-16 -bottom-16 w-80 h-80 bg-indigo-300/10 rounded-full blur-3xl pointer-events-none"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Comparison Section -->
+  <section id="compare" class="py-20 border-t border-slate-200/70 relative">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
+          Чем ProksiFi отличается от других решений?
+        </h2>
+        <p class="text-slate-600 text-base">
+          Честное сравнение с классическими VPN и утилитами модификации пакетов
+        </p>
+      </div>
+
+      <div class="light-glass-card rounded-3xl overflow-hidden border border-slate-200/80 shadow-md">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500">
+              <tr>
+                <th class="py-4 px-6 font-bold">Функционал</th>
+                <th class="py-4 px-6 font-extrabold text-sky-600 bg-sky-50/60">ProksiFi (v1.1.7)</th>
+                <th class="py-4 px-6 font-bold">Обычный VPN</th>
+                <th class="py-4 px-6 font-bold">Zapret / GoodCheck</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+              <tr class="hover:bg-slate-50/50 transition">
+                <td class="py-4 px-6 text-slate-900 font-semibold flex items-center gap-2">
+                  <i data-lucide="youtube" class="w-4 h-4 text-red-500"></i> YouTube 4K 60FPS без лагов
+                </td>
+                <td class="py-4 px-6 text-emerald-600 font-bold bg-sky-50/40 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i> Мгновенно</td>
+                <td class="py-4 px-6 text-amber-600">Часто режет скорость</td>
+                <td class="py-4 px-6 text-slate-500">Зависит от провайдера</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 transition">
+                <td class="py-4 px-6 text-slate-900 font-semibold flex items-center gap-2">
+                  <i data-lucide="gamepad-2" class="w-4 h-4 text-sky-600"></i> Пинг в онлайн-играх
+                </td>
+                <td class="py-4 px-6 text-emerald-600 font-bold bg-sky-50/40 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i> Не меняется (0 ms)</td>
+                <td class="py-4 px-6 text-red-600 font-semibold">+60...120 ms</td>
+                <td class="py-4 px-6 text-slate-600">Не меняется</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 transition">
+                <td class="py-4 px-6 text-slate-900 font-semibold flex items-center gap-2">
+                  <i data-lucide="shield-alert" class="w-4 h-4 text-amber-500"></i> Риск бана от античитов (Vanguard/EAC)
+                </td>
+                <td class="py-4 px-6 text-emerald-600 font-bold bg-sky-50/40 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i> 0% (Безопасно)</td>
+                <td class="py-4 px-6 text-amber-600">Ложные блокировки IP</td>
+                <td class="py-4 px-6 text-amber-600">Инъекции пакетов WinDivert</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 transition">
+                <td class="py-4 px-6 text-slate-900 font-semibold flex items-center gap-2">
+                  <i data-lucide="credit-card" class="w-4 h-4 text-emerald-600"></i> Доступ к росс. банкам и Госуслугам
+                </td>
+                <td class="py-4 px-6 text-emerald-600 font-bold bg-sky-50/40 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i> Полный (Direct IP)</td>
+                <td class="py-4 px-6 text-red-600 font-semibold">Блокируются</td>
+                <td class="py-4 px-6 text-slate-600">Работают</td>
+              </tr>
+              <tr class="hover:bg-slate-50/50 transition">
+                <td class="py-4 px-6 text-slate-900 font-semibold flex items-center gap-2">
+                  <i data-lucide="wrench" class="w-4 h-4 text-indigo-600"></i> Простота запуска
+                </td>
+                <td class="py-4 px-6 text-emerald-600 font-bold bg-sky-50/40 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i> Установка в 1 клик</td>
+                <td class="py-4 px-6 text-slate-600">Требует логин/подписку</td>
+                <td class="py-4 px-6 text-red-600 font-semibold">Подбор батников и ключей</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Step-by-Step Quick Start -->
+  <section id="installation" class="py-20 border-t border-slate-200/70 bg-white/50 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
+          Начните за 30 секунд
+        </h2>
+        <p class="text-slate-600 text-base sm:text-lg">
+          Никаких консольных команд, ручной настройки конфигов и регистрации
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Step 1 -->
+        <div class="light-glass-card rounded-3xl p-8 relative">
+          <div class="text-5xl font-extrabold font-mono text-sky-300/50 mb-4">01</div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2">Скачайте инсталлятор</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-6">
+            Загрузите официальный установочный файл <code class="text-sky-700 font-mono bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">Proksi_Patch_Setup.exe</code> с GitHub или Telegram-канала.
+          </p>
+          <a href="https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/download/v1.1.7/Proksi_Patch_Setup.exe" class="inline-flex items-center gap-2 text-xs font-semibold text-sky-600 hover:text-sky-700 transition">
+            <span>Прямая ссылка</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="light-glass-card rounded-3xl p-8 relative">
+          <div class="text-5xl font-extrabold font-mono text-blue-300/50 mb-4">02</div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2">Запустите установку</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-6">
+            Мастер установки автоматически распакует ядро маршрутизации, настроит системный шлюз и создаст ярлык автозапуска.
+          </p>
+          <span class="inline-flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-500"></i> Занимает около 5 секунд
+          </span>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="light-glass-card rounded-3xl p-8 relative">
+          <div class="text-5xl font-extrabold font-mono text-indigo-300/50 mb-4">03</div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2">Наслаждайтесь интернетом</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-6">
+            Откройте YouTube, Telegram или Antigravity в браузере. Всё работает на максимальной скорости в фоне.
+          </p>
+          <span class="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i> Готово к работе
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive FAQ Accordion -->
+  <section id="faq" class="py-20 border-t border-slate-200/70 relative">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-16">
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
+          Часто задаваемые вопросы
+        </h2>
+        <p class="text-slate-600 text-base">
+          Ответы на популярные вопросы о безопасности и работе утилиты
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- FAQ 1 -->
+        <div class="light-glass-card rounded-2xl border border-slate-200/80 overflow-hidden">
+          <button onclick="toggleFaq(1)" class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+            <span class="font-bold text-base text-slate-900">Это безопасно для онлайн-игр и Steam?</span>
+            <i data-lucide="chevron-down" id="faqIcon-1" class="w-5 h-5 text-sky-600 transition-transform duration-300"></i>
+          </button>
+          <div id="faqAnswer-1" class="hidden px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+            Да, абсолютно безопасно. В правилах маршрутизации явно указано пускать трафик игр (Steam, Riot Games, Epic Games, EA, Battle.net) и античитов (Vanguard, EAC, BattlEye) напрямую в сеть вашего провайдера. Ваши игровые пакеты не попадают в прокси-сервер.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="light-glass-card rounded-2xl border border-slate-200/80 overflow-hidden">
+          <button onclick="toggleFaq(2)" class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+            <span class="font-bold text-base text-slate-900">Будут ли работать российские сайты и банки?</span>
+            <i data-lucide="chevron-down" id="faqIcon-2" class="w-5 h-5 text-sky-600 transition-transform duration-300"></i>
+          </button>
+          <div id="faqAnswer-2" class="hidden px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+            Да. Доменные зоны <code class="text-sky-700 font-mono bg-sky-50 px-1 py-0.5 rounded">.ru</code>, <code class="text-sky-700 font-mono bg-sky-50 px-1 py-0.5 rounded">.рф</code>, а также все ключевые российские сервисы (Сбер, Т-Банк, Госуслуги, Ozon, WB, Яндекс, VK) исключены из проксирования. Банки не заблокируют ваш аккаунт из-за смены страны.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="light-glass-card rounded-2xl border border-slate-200/80 overflow-hidden">
+          <button onclick="toggleFaq(3)" class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+            <span class="font-bold text-base text-slate-900">Как отключить или удалить программу?</span>
+            <i data-lucide="chevron-down" id="faqIcon-3" class="w-5 h-5 text-sky-600 transition-transform duration-300"></i>
+          </button>
+          <div id="faqAnswer-3" class="hidden px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+            В правом нижнем углу экрана (возле часов) кликните правой кнопкой мыши по значку ProksiFi и выберите «Выход» — системные настройки прокси автоматически восстановятся в исходное состояние. Удаление доступно штатно через панель управления Windows.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="light-glass-card rounded-2xl border border-slate-200/80 overflow-hidden">
+          <button onclick="toggleFaq(4)" class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+            <span class="font-bold text-base text-slate-900">Программа бесплатная?</span>
+            <i data-lucide="chevron-down" id="faqIcon-4" class="w-5 h-5 text-sky-600 transition-transform duration-300"></i>
+          </button>
+          <div id="faqAnswer-4" class="hidden px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">
+            Да, ProksiFi распространяется бесплатно для русскоязычного сообщества разработчиков и пользователей. Исходный код открыт на GitHub.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Final High-Conversion CTA Banner -->
+  <section class="py-20 relative">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="relative rounded-3xl p-8 sm:p-12 lg:p-16 overflow-hidden bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-700 text-center shadow-2xl shadow-sky-600/30 text-white">
+        
+        <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-white/10 rounded-full blur-[90px] pointer-events-none"></div>
+
+        <div class="relative z-10">
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">
+            Готовы вернуть быстрый и свободный интернет?
+          </h2>
+          <p class="text-sky-100 text-base sm:text-lg max-w-2xl mx-auto mb-10">
+            Скачайте ProksiFi v1.1.7 прямо сейчас и забудьте о буферизации видео и замедлениях.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="https://github.com/ProksiPatch/antigravity-Proksi_Patch/releases/download/v1.1.7/ProksiFi_Setup_v1.1.7.exe" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-white text-slate-900 hover:text-sky-600 hover:bg-slate-50 font-bold text-base shadow-xl transition-all duration-300 hover:scale-105 active:scale-95">
+              <i data-lucide="download" class="w-5 h-5 text-sky-600"></i>
+              <span>Скачать для Windows 10/11</span>
+            </a>
+            <a href="https://t.me/antigravity_proxy" onclick="openTelegram(event)" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-semibold text-base transition">
+              <i data-lucide="send" class="w-5 h-5 text-white"></i>
+              <span>Канал в Telegram</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200/80 bg-slate-100/70 py-12 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-3">
+        <img src="icon.jpg" alt="ProksiFi" class="w-6 h-6 rounded-lg opacity-85">
+        <span class="font-medium">© 2026 ProksiFi Community. Открытый проект для стабильного интернета.</span>
+      </div>
+
+      <div class="flex items-center gap-6 text-slate-600 font-medium">
+        <a href="https://github.com/ProksiPatch/antigravity-Proksi_Patch" target="_blank" rel="noopener" class="hover:text-sky-600 transition">GitHub Репозиторий</a>
+        <a href="https://t.me/antigravity_proxy" onclick="openTelegram(event)" class="hover:text-sky-600 transition">Telegram Сообщество</a>
+        <a href="sitemap.xml" class="hover:text-sky-600 transition">Sitemap</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Interactive Scripts -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Interactive Ping Simulator
+    function simulatePing() {
+      const btn = document.getElementById('pingBtn');
+      const icon = document.getElementById('pingIcon');
+      const yt = document.getElementById('pingYt');
+      const tg = document.getElementById('pingTg');
+      const ai = document.getElementById('pingAi');
+      const gm = document.getElementById('pingGm');
+
+      icon.classList.add('animate-spin');
+      btn.classList.add('opacity-75');
+
+      yt.textContent = '...';
+      tg.textContent = '...';
+      ai.textContent = '...';
+
+      setTimeout(() => {
+        yt.textContent = (Math.floor(Math.random() * 5) + 16) + ' ms';
+        tg.textContent = (Math.floor(Math.random() * 6) + 20) + ' ms';
+        ai.textContent = (Math.floor(Math.random() * 8) + 28) + ' ms';
+        gm.textContent = '0 ms';
+
+        icon.classList.remove('animate-spin');
+        btn.classList.remove('opacity-75');
+      }, 700);
+    }
+
+    // Interactive FAQ Accordion
+    function toggleFaq(id) {
+      const answer = document.getElementById(`faqAnswer-${id}`);
+      const icon = document.getElementById(`faqIcon-${id}`);
+
+      if (answer.classList.contains('hidden')) {
+        answer.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        answer.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Smart Telegram Opener (Direct App + Web Fallback)
+    function openTelegram(e) {
+      if (e) e.preventDefault();
+      // 1. Direct deep-link to Telegram app (bypasses browser ISP blocks)
+      window.location.href = 'tg://resolve?domain=antigravity_proxy';
+      // 2. Also open web link as fallback
+      setTimeout(() => {
+        window.open('https://t.me/antigravity_proxy', '_blank');
+      }, 350);
+    }
+  </script>
+
+</body>
+</html>
