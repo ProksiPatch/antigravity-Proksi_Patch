@@ -13,6 +13,7 @@ last_tg_post.json
 
 # Готовые бинарники — хранятся в GitHub Releases, не в git
 Proksi_Patch_Setup.exe
+ProksiFi_Setup*.exe
 
 # Python кэш и временные файлы
 __pycache__/
@@ -34,6 +35,7 @@ Thumbs.db
 *.key
 *.token
 PROJECT_MEMORY.md
+PROJECT_*_RESTORED.md
 AGENTS.md
 GEMINI.md
 topics.json
