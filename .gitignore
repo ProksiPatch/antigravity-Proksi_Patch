@@ -1,0 +1,24 @@
+# Security & Private Credentials
+config/server.json
+cookie.txt
+*.key
+*.pem
+
+# Logs & Temporary Files
+*.log
+*.tmp
+*.bak
+scratch/
+
+# Build artifacts and backups
+release/*_old_*.exe
+release/*.tmp
+bin/*.old*
+
+# OS & Editor files
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
+*.suo
+*.user
