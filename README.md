@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-MIT-lightgrey)]()
 [![Telegram](https://img.shields.io/badge/Telegram-@antigravity__proxy-2CA5E0?logo=telegram)](https://t.me/antigravity_proxy)
 
-**Автономный фоновый шлюз Windows для прозрачной разблокировки сервисов Google Gemini, AI Studio, NotebookLM, среды разработки Google Antigravity IDE, YouTube, VirusTotal и Telegram из России.**
+**Автономный фоновый шлюз Windows для прозрачной разблокировки сервисов Google Gemini, AI Studio, NotebookLM, среды разработки Google Antigravity IDE, YouTube и Telegram из России.**
 
 Работает напрямую через выделенный высокоскоростной VPS во Франкфурте (Германия) по протоколу **VLESS + Reality + gRPC** с виртуальным сетевым адаптером **ProksiFiTUN** (Wintun + gVisor).
 
@@ -18,10 +18,6 @@
 * **Google Antigravity IDE & CLI:** Бесперебойная работа среды разработки и языковых серверов без региональных ошибок (`User location is not supported`).
 * **YouTube 4K & Media:** Аппаратный обход замедлений с отсечкой зависающего протокола QUIC (UDP 443).
 * **Telegram Desktop & Web:** Обход блокировок дата-центров Telegram (звонки, фото, видео).
-* **VirusTotal & Security:** Проверка файлов на `virustotal.com` через чистый европейский маршрут.
-* **Раздельное туннелирование (Split Tunneling):** Все российские сайты (Госуслуги, банки, маркетплейсы, VK, Яндекс) и онлайн-игры идут напрямую через вашего домашнего провайдера с максимальной скоростью и нулевым риском бана античитами (BattlEye, EAC, Vanguard).
-* **Торрент-фильтрация:** Автоматическое исключение BitTorrent/qBittorrent из туннеля для защиты трафика.
-* **Классический тёмный интерфейс в стиле Windows 11 Fluent Dark:** Элегантное меню трея с плавными эффектами.
 * **Интеллектуальная диагностика:** Отдельная интерактивная консоль PowerShell с автоматическим распознаванием сетевых кодов ошибок.
 
 ---
