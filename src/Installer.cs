@@ -94,7 +94,7 @@ namespace ProksiFiApp {
             miStatus.Padding = new Padding(12, 6, 12, 2);
             trayMenu.Items.Add(miStatus);
 
-            miNode = new ToolStripMenuItem("  Сервер: Франкфурт (130.17.6.138)");
+            miNode = new ToolStripMenuItem("  Сервер: Европа (Франкфурт)");
             miNode.Font = new Font(trayMenu.Font.FontFamily, 8.5f, FontStyle.Regular);
             miNode.ForeColor = Color.FromArgb(150, 150, 150);
             miNode.Padding = new Padding(12, 0, 12, 6);

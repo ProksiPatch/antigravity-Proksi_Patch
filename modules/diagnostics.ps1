@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # ProksiFi v2.0 - Advanced Diagnostics & Error Recognition Engine
 # Automated health-checks, log scanning, root-cause analysis, and step-by-step fixes
 # ==============================================================================
@@ -53,9 +53,9 @@ $script:ErrorSignatures = @(
     @{
         Id          = "VPS_NETWORK_TIMEOUT"
         Severity    = "WARNING"
-        Title       = "Сетевой таймаут соединения к серверу (Франкфурт 130.17.6.138)"
+        Title       = "Сетевой таймаут соединения к серверу (Франкфурт VPS)"
         Patterns    = @(
-            "dial tcp.*130.17.6.138.*i/o timeout",
+            "dial tcp.*i/o timeout",
             "connect: connection timed out",
             "dial tcp.*2083.*i/o timeout",
             "read: connection reset by peer"
