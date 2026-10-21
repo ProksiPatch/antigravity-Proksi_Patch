@@ -1,4 +1,5 @@
 # Security & Private Credentials
+PROJECT_MEMORY.md
 config/server.json
 cookie.txt
 *.key
