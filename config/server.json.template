@@ -1,0 +1,6 @@
+{
+  "panel_url": "http://YOUR_SERVER_IP:2053",
+  "base_path": "",
+  "username": "admin",
+  "password": "YOUR_PASSWORD"
+}
