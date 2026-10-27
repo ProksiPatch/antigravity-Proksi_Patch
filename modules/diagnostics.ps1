@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # ProksiFi v2.0 - Advanced Diagnostics & Error Recognition Engine
 # Automated health-checks, log scanning, root-cause analysis, and step-by-step fixes
 # ==============================================================================

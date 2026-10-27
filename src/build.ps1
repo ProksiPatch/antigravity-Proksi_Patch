@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Path $PSScriptRoot -Parent
 $releaseDir = Join-Path $projectRoot "release"
 $binDir = Join-Path $projectRoot "bin"

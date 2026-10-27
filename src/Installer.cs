@@ -43,12 +43,15 @@ namespace ProksiFiApp {
 
         private System.Windows.Forms.Timer timerStatus;
         private bool isBusy = false;
-        private Icon currentTrayIcon = null;
+        private Icon iconActive = null;
+        private Icon iconStopped = null;
+        private Icon iconChecking = null;
         private SynchronizationContext syncContext;
 
         public TrayAppContext() {
             syncContext = SynchronizationContext.Current ?? new SynchronizationContext();
 
+            LoadCachedIcons();
             InitializeTray();
             UpdateServiceStatus();
 
@@ -119,13 +122,13 @@ namespace ProksiFiApp {
             miEnable = new ToolStripMenuItem("Включить обход");
             miEnable.ForeColor = Color.FromArgb(240, 240, 240);
             miEnable.Padding = new Padding(12, 5, 12, 5);
-            miEnable.Click += (s, e) => RunSetupOperation("manage.ps1 -Action start", "Включение обхода...");
+            miEnable.Click += (s, e) => RunSetupOperation("manage.ps1", "-Action start", "Включение обхода...");
             trayMenu.Items.Add(miEnable);
 
             miDisable = new ToolStripMenuItem("Выключить обход");
             miDisable.ForeColor = Color.FromArgb(240, 240, 240);
             miDisable.Padding = new Padding(12, 5, 12, 5);
-            miDisable.Click += (s, e) => RunSetupOperation("manage.ps1 -Action stop", "Выключение обхода...");
+            miDisable.Click += (s, e) => RunSetupOperation("manage.ps1", "-Action stop", "Выключение обхода...");
             trayMenu.Items.Add(miDisable);
 
             miTest = new ToolStripMenuItem("Тест подключения (Gemini, TG, IP)");
@@ -137,7 +140,7 @@ namespace ProksiFiApp {
             miRestart = new ToolStripMenuItem("Перезапустить службу");
             miRestart.ForeColor = Color.FromArgb(240, 240, 240);
             miRestart.Padding = new Padding(12, 5, 12, 5);
-            miRestart.Click += (s, e) => RunSetupOperation("manage.ps1 -Action restart", "Перезапуск службы...");
+            miRestart.Click += (s, e) => RunSetupOperation("manage.ps1", "-Action restart", "Перезапуск службы...");
             trayMenu.Items.Add(miRestart);
 
             sepActions = new ToolStripSeparator();
@@ -244,13 +247,9 @@ namespace ProksiFiApp {
 
         private void SetTrayState(string title, Color color, string statusText, bool isRunning, bool installed) {
             try {
-                Icon oldIcon = currentTrayIcon;
-                string state = !installed ? "checking" : (isRunning ? "active" : "stopped");
-                currentTrayIcon = GetTrayIcon(state);
-                trayIcon.Icon = currentTrayIcon;
-                if (oldIcon != null) {
-                    DestroyIcon(oldIcon.Handle);
-                    oldIcon.Dispose();
+                Icon targetIcon = !installed ? iconChecking : (isRunning ? iconActive : iconStopped);
+                if (targetIcon != null && trayIcon.Icon != targetIcon) {
+                    trayIcon.Icon = targetIcon;
                 }
             } catch { }
 
@@ -271,6 +270,14 @@ namespace ProksiFiApp {
             miTest.Enabled = !isBusy;
             miDiag.Enabled = !isBusy;
             miLogs.Enabled = !isBusy;
+        }
+
+        private void LoadCachedIcons() {
+            try {
+                iconActive = GetTrayIcon("active");
+                iconStopped = GetTrayIcon("stopped");
+                iconChecking = GetTrayIcon("checking");
+            } catch { }
         }
 
         private Icon GetTrayIcon(string state) {
@@ -296,50 +303,57 @@ namespace ProksiFiApp {
             Size sz = SystemInformation.SmallIconSize;
             int w = Math.Max(16, sz.Width);
             int h = Math.Max(16, sz.Height);
-            Bitmap bmp = new Bitmap(w, h);
-            using (Graphics g = Graphics.FromImage(bmp)) {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            using (Bitmap bmp = new Bitmap(w, h)) {
+                using (Graphics g = Graphics.FromImage(bmp)) {
+                    g.SmoothingMode = SmoothingMode.AntiAlias;
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                float cx = w / 2f;
-                PointF[] leftShield = new PointF[] {
-                    new PointF(cx, 1f),
-                    new PointF(2f, 3f),
-                    new PointF(2f, 8f),
-                    new PointF(cx, h - 2f)
-                };
-                PointF[] rightShield = new PointF[] {
-                    new PointF(cx, 1f),
-                    new PointF(w - 2f, 3f),
-                    new PointF(w - 2f, 8f),
-                    new PointF(cx, h - 2f)
-                };
+                    float cx = w / 2f;
+                    PointF[] leftShield = new PointF[] {
+                        new PointF(cx, 1f),
+                        new PointF(2f, 3f),
+                        new PointF(2f, 8f),
+                        new PointF(cx, h - 2f)
+                    };
+                    PointF[] rightShield = new PointF[] {
+                        new PointF(cx, 1f),
+                        new PointF(w - 2f, 3f),
+                        new PointF(w - 2f, 8f),
+                        new PointF(cx, h - 2f)
+                    };
 
-                using (Brush bLeft = new SolidBrush(statusColor)) {
-                    g.FillPolygon(bLeft, leftShield);
+                    using (Brush bLeft = new SolidBrush(statusColor)) {
+                        g.FillPolygon(bLeft, leftShield);
+                    }
+                    using (Brush bRight = new SolidBrush(Color.FromArgb(
+                        Math.Max(0, (int)statusColor.R - 40),
+                        Math.Max(0, (int)statusColor.G - 40),
+                        Math.Max(0, (int)statusColor.B - 40)))) {
+                        g.FillPolygon(bRight, rightShield);
+                    }
+
+                    // Center white bolt
+                    PointF[] bolt = new PointF[] {
+                        new PointF(cx + 0.5f, 2.5f),
+                        new PointF(cx - 2.5f, 7f),
+                        new PointF(cx - 0.2f, 7f),
+                        new PointF(cx - 1.2f, 12f),
+                        new PointF(cx + 2.5f, 6.5f),
+                        new PointF(cx + 0.2f, 6.5f)
+                    };
+                    using (Brush bBolt = new SolidBrush(Color.White)) {
+                        g.FillPolygon(bBolt, bolt);
+                    }
                 }
-                using (Brush bRight = new SolidBrush(Color.FromArgb(
-                    Math.Max(0, (int)statusColor.R - 40),
-                    Math.Max(0, (int)statusColor.G - 40),
-                    Math.Max(0, (int)statusColor.B - 40)))) {
-                    g.FillPolygon(bRight, rightShield);
-                }
-
-                // Center white bolt
-                PointF[] bolt = new PointF[] {
-                    new PointF(cx + 0.5f, 2.5f),
-                    new PointF(cx - 2.5f, 7f),
-                    new PointF(cx - 0.2f, 7f),
-                    new PointF(cx - 1.2f, 12f),
-                    new PointF(cx + 2.5f, 6.5f),
-                    new PointF(cx + 0.2f, 6.5f)
-                };
-                using (Brush bBolt = new SolidBrush(Color.White)) {
-                    g.FillPolygon(bBolt, bolt);
+                IntPtr hIcon = bmp.GetHicon();
+                try {
+                    using (Icon temp = Icon.FromHandle(hIcon)) {
+                        return (Icon)temp.Clone();
+                    }
+                } finally {
+                    DestroyIcon(hIcon);
                 }
             }
-            IntPtr hIcon = bmp.GetHicon();
-            return Icon.FromHandle(hIcon);
         }
 
         private string EnsureExtractedPayload() {
@@ -409,7 +423,7 @@ namespace ProksiFiApp {
         }
 
         // Silent background operations (start, stop, restart)
-        private void RunSetupOperation(string scriptWithArgs, string operationTitle, Action<string> onCompleted = null) {
+        private void RunSetupOperation(string scriptName, string scriptArgs, string operationTitle, Action<string> onCompleted = null) {
             if (isBusy) return;
             isBusy = true;
             SetMenuItemsEnabled(false);
@@ -417,8 +431,6 @@ namespace ProksiFiApp {
             ThreadPool.QueueUserWorkItem(_ => {
                 string accumulatedOutput = "";
                 try {
-                    string scriptName = scriptWithArgs.Split(' ')[0];
-                    string fullArgs = scriptWithArgs.Substring(scriptName.Length).Trim();
                     string scriptPath = Path.Combine(InstallPath, scriptName);
                     string workDir = InstallPath;
 
@@ -431,7 +443,7 @@ namespace ProksiFiApp {
 
                     ProcessStartInfo psi = new ProcessStartInfo();
                     psi.FileName = "powershell.exe";
-                    psi.Arguments = "-NoProfile -ExecutionPolicy Unrestricted -File \"" + scriptPath + "\" " + fullArgs;
+                    psi.Arguments = "-NoProfile -ExecutionPolicy Unrestricted -File \"" + scriptPath + "\" " + scriptArgs;
                     psi.WorkingDirectory = workDir;
                     psi.StandardOutputEncoding = System.Text.Encoding.UTF8;
                     psi.StandardErrorEncoding = System.Text.Encoding.UTF8;
@@ -498,7 +510,7 @@ namespace ProksiFiApp {
 
             if (dr == DialogResult.Yes) {
                 int currentPid = Process.GetCurrentProcess().Id;
-                RunSetupOperation("uninstall.ps1 -FullClean -CallerPID " + currentPid, "Полное удаление службы и очистка системы...", (res) => {
+                RunSetupOperation("uninstall.ps1", "-FullClean -CallerPID " + currentPid, "Полное удаление службы и очистка системы...", (res) => {
                     try {
                         if (timerStatus != null) {
                             timerStatus.Stop();
@@ -548,6 +560,9 @@ namespace ProksiFiApp {
                     trayIcon.Dispose();
                     trayIcon = null;
                 }
+                if (iconActive != null) { iconActive.Dispose(); iconActive = null; }
+                if (iconStopped != null) { iconStopped.Dispose(); iconStopped = null; }
+                if (iconChecking != null) { iconChecking.Dispose(); iconChecking = null; }
                 Application.DoEvents();
             } catch { }
             ExitThread();
@@ -631,7 +646,7 @@ namespace ProksiFiApp {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
             try {
-                if (e.ToolStrip.IsHandleCreated) {
+                if (e.ToolStrip.IsHandleCreated && e.ToolStrip.Region == null) {
                     IntPtr rgn = CreateRoundRectRgn(0, 0, e.ToolStrip.Width + 1, e.ToolStrip.Height + 1, 8, 8);
                     if (rgn != IntPtr.Zero) {
                         e.ToolStrip.Region = Region.FromHrgn(rgn);

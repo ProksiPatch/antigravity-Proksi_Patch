@@ -20,6 +20,8 @@ function New-ProksiFiCoreConfig {
         "google.com",
         "google.ru",
         "google.de",
+        "gmail.com",
+        "googlemail.com",
         "gemini.google.com",
         "aistudio.google.com",
         "notebooklm.google.com",
@@ -29,12 +31,18 @@ function New-ProksiFiCoreConfig {
         "google",
         "goog",
         "run.app",
+        "appspot.com",
         "google.dev",
+        "google.org",
+        "google.net",
+        "withgoogle.com",
+        "googlelabs.com",
         "cloud.google.com",
         "googlecloud.com",
         "antigravity.google",
         "deepmind.google",
         "generativeai.google",
+        "about.google",
         "gstatic.com",
         "googleusercontent.com",
         "googlevideo.com",
@@ -42,7 +50,13 @@ function New-ProksiFiCoreConfig {
         "ytimg.com",
         "ggpht.com",
         "gvt1.com",
+        "gvt2.com",
+        "gvt3.com",
         "1e100.net",
+        "doubleclick.net",
+        "googleadservices.com",
+        "google-analytics.com",
+        "googletagmanager.com",
         "recaptcha.net",
         "g.co",
         "goo.gl",
@@ -59,6 +73,14 @@ function New-ProksiFiCoreConfig {
         "github.com",
         "githubusercontent.com",
         "githubcopilot.com",
+        "githubassets.com",
+        "github.githubassets.com",
+        "cloudflare.com",
+        "cdnjs.cloudflare.com",
+        "pki.goog",
+        "ocsp.pki.goog",
+        "crl.pki.goog",
+        "googletagservices.com",
         "ipinfo.io",
         "virustotal.com",
         "www.virustotal.com",
@@ -155,7 +177,9 @@ function New-ProksiFiCoreConfig {
                         "agy.exe",
                         "Code.exe",
                         "Telegram.exe",
-                        "telegram.exe"
+                        "telegram.exe",
+                        "ag_dns.exe",
+                        "AG_2.26.0.exe"
                     )
                     server = "remote-dns"
                 },
@@ -174,7 +198,7 @@ function New-ProksiFiCoreConfig {
                 interface_name = "ProksiFiTUN"
                 address        = @("172.19.0.1/30")
                 auto_route     = $true
-                strict_route   = $false
+                strict_route   = $true
                 stack          = "gvisor"
             },
             @{
@@ -226,7 +250,9 @@ function New-ProksiFiCoreConfig {
                     outbound     = "direct"
                 },
                 @{
-                    action = "sniff"
+                    action  = "sniff"
+                    sniffer = @("http", "tls", "quic")
+                    timeout = "500ms"
                 },
                 @{
                     protocol = @("bittorrent")
@@ -237,7 +263,7 @@ function New-ProksiFiCoreConfig {
                     action  = "hijack-dns"
                 },
                 @{
-                    port    = @(443)
+                    port    = @(443, 3478, 19302)
                     network = @("udp")
                     action  = "reject"
                 },
@@ -257,7 +283,9 @@ function New-ProksiFiCoreConfig {
                         "agy.exe",
                         "Code.exe",
                         "Telegram.exe",
-                        "telegram.exe"
+                        "telegram.exe",
+                        "ag_dns.exe",
+                        "AG_2.26.0.exe"
                     )
                     outbound     = "proxy"
                 },
@@ -265,7 +293,9 @@ function New-ProksiFiCoreConfig {
                     process_path_regex = @(
                         "(?i).*programs[\\/]antigravity.*",
                         "(?i).*\.gemini.*",
-                        "(?i).*microsoft vs code.*"
+                        "(?i).*microsoft vs code.*",
+                        "(?i).*ag_.*\.exe.*",
+                        "(?i).*ag[0-9_\.]*\.exe.*"
                     )
                     outbound     = "proxy"
                 },
