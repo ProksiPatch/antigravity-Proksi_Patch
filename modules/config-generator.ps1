@@ -93,7 +93,17 @@ function New-ProksiFiCoreConfig {
         "telegram.dog",
         "telegra.ph",
         "telesco.pe",
-        "tdesktop.com"
+        "tdesktop.com",
+        "openai.com",
+        "chatgpt.com",
+        "oaistatic.com",
+        "oaiusercontent.com",
+        "sora.com",
+        "livekit.cloud",
+        "arkoselabs.com",
+        "soundcloud.com",
+        "sndcdn.com",
+        "snd.sc"
     )
 
     $telegramCIDRs = @(
@@ -179,7 +189,9 @@ function New-ProksiFiCoreConfig {
                         "Telegram.exe",
                         "telegram.exe",
                         "ag_dns.exe",
-                        "AG_2.26.0.exe"
+                        "AG_2.26.0.exe",
+                        "ChatGPT.exe",
+                        "chatgpt.exe"
                     )
                     server = "remote-dns"
                 },
@@ -285,7 +297,9 @@ function New-ProksiFiCoreConfig {
                         "Telegram.exe",
                         "telegram.exe",
                         "ag_dns.exe",
-                        "AG_2.26.0.exe"
+                        "AG_2.26.0.exe",
+                        "ChatGPT.exe",
+                        "chatgpt.exe"
                     )
                     outbound     = "proxy"
                 },
@@ -295,7 +309,8 @@ function New-ProksiFiCoreConfig {
                         "(?i).*\.gemini.*",
                         "(?i).*microsoft vs code.*",
                         "(?i).*ag_.*\.exe.*",
-                        "(?i).*ag[0-9_\.]*\.exe.*"
+                        "(?i).*ag[0-9_\.]*\.exe.*",
+                        "(?i).*chatgpt.*"
                     )
                     outbound     = "proxy"
                 },
