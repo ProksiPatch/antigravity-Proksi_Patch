@@ -1,8 +1,8 @@
 ﻿# ==============================================================================
-# ProksiFi v2.0 - Service Management Console
+# ProksiFi v2.0 - Service Management & Quick Repair Console
 # ==============================================================================
 param(
-    [ValidateSet("status", "start", "stop", "restart", "test", "info", "logs", "diag", "help")]
+    [ValidateSet("status", "start", "stop", "restart", "test", "ag", "info", "logs", "diag", "fix", "upload", "help")]
     [string]$Action = "status",
     [int]$Lines = 30,
     [switch]$Follow
@@ -25,23 +25,38 @@ if (-not (Get-Service -Name $serviceName -ErrorAction SilentlyContinue)) {
 
 function Show-Status {
     $svc = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
-    Write-Host "`n=== PROKSIFI SERVICE STATUS ===" -ForegroundColor Cyan
+    Write-Host "`n=== СТАТУС СЛУЖБЫ PROKSIFI ===" -ForegroundColor Cyan
     if ($svc) {
         $color = if ($svc.Status -eq "Running") { "Green" } else { "Red" }
-        Write-Host "  Service: $($svc.DisplayName) ($serviceName)"
-        Write-Host "  Status:  $($svc.Status)" -ForegroundColor $color
-        Write-Host "  Startup: $($svc.StartType)"
+        Write-Host "  Служба:  $($svc.DisplayName) ($serviceName)"
+        Write-Host "  Статус:  $($svc.Status)" -ForegroundColor $color
+        Write-Host "  Запуск:  $($svc.StartType)"
     } else {
-        Write-Host "  Service $serviceName is NOT installed!" -ForegroundColor Red
-        Write-Host "  Run install.bat or .\install.ps1 as Administrator." -ForegroundColor Yellow
+        Write-Host "  Служба $serviceName НЕ установлена в системе!" -ForegroundColor Red
+        Write-Host "  Запустите установку от имени Администратора." -ForegroundColor Yellow
         return
+    }
+
+    $core = Get-Process -Name "core" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($core) {
+        $ram = [Math]::Round($core.WorkingSet64 / 1MB, 1)
+        Write-Host "  Ядро:    core.exe (PID: $($core.Id), RAM: $ram МБ)" -ForegroundColor Green
+    } else {
+        Write-Host "  Ядро:    core.exe не запущен" -ForegroundColor Red
     }
 
     $tunAdapter = Get-NetAdapter -Name "ProksiFiTUN*", "AntigravityTUN*" -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($tunAdapter) {
-        Write-Host "  Adapter: $($tunAdapter.Name) (Status: $($tunAdapter.Status))" -ForegroundColor Green
+        Write-Host "  Адаптер: $($tunAdapter.Name) (Статус: $($tunAdapter.Status))" -ForegroundColor Green
     } else {
-        Write-Host "  Adapter: ProksiFiTUN is not active" -ForegroundColor Gray
+        Write-Host "  Адаптер: ProksiFiTUN не активен" -ForegroundColor Gray
+    }
+
+    $agProxy = [System.Environment]::GetEnvironmentVariable("AG_LS_PROXY", "User")
+    if ($agProxy -eq "http://127.0.0.1:7890") {
+        Write-Host "  AG_LS:   $agProxy (Корректно)" -ForegroundColor Green
+    } elseif ($agProxy) {
+        Write-Host "  AG_LS:   $agProxy (ВНИМАНИЕ: подменен сторонним патчером!)" -ForegroundColor Yellow
     }
 }
 
@@ -52,96 +67,44 @@ function Show-Info {
     }
     if (Test-Path $profilePath) {
         $p = Get-Content -Path $profilePath -Raw | ConvertFrom-Json
-        Write-Host "`n=== CLIENT BINDING INFO ===" -ForegroundColor Cyan
+        Write-Host "`n=== ПАРАМЕТРЫ КЛИЕНТСКОГО ПРОФИЛЯ ===" -ForegroundColor Cyan
         Write-Host "  HWID:       $($p.HWID)"
         Write-Host "  Short ID:   $($p.ShortHWID)"
         Write-Host "  Email:      $($p.Email)"
         Write-Host "  UUID:       $($p.UUID)"
-        Write-Host "  Server:     $($p.Reality.ServerHost):$($p.Reality.ServerPort)"
+        Write-Host "  Сервер:     $($p.Reality.ServerHost):$($p.Reality.ServerPort)"
         Write-Host "  SNI:        $($p.Reality.ServerName)"
-        Write-Host "  gRPC Svc:   $($p.Reality.ServiceName)"
+        Write-Host "  gRPC:       $($p.Reality.ServiceName)"
     } else {
-        Write-Host "Profile device.json not found." -ForegroundColor Yellow
+        Write-Host "Файл профиля device.json не найден." -ForegroundColor Yellow
+    }
+}
+
+function Test-AntigravitySuite {
+    if (Get-Command Invoke-ProksiFiDiagnostics -ErrorAction SilentlyContinue) {
+        Invoke-ProksiFiDiagnostics
     }
 }
 
 function Test-ConnectionQuality {
-    Write-Host "`n=== ROUTING AND GEO TESTING ===" -ForegroundColor Cyan
-
-    Write-Host "1. Testing Google Gemini (via 127.0.0.1:7890)..." -NoNewline
-    try {
-        $res = & curl.exe -s -o NUL -w "%{http_code}" -m 7 -x http://127.0.0.1:7890 https://gemini.google.com
-        if ($res -eq "200" -or $res -eq "302") {
-            Write-Host " [OK] ($res)" -ForegroundColor Green
-        } else {
-            Write-Host " [Code: $res]" -ForegroundColor Yellow
-        }
-    } catch {
-        Write-Host " [FAIL]" -ForegroundColor Red
-    }
-
-    Write-Host "2. Testing Google AI Studio API..." -NoNewline
-    try {
-        $res = & curl.exe -s -o NUL -w "%{http_code}" -m 7 -x http://127.0.0.1:7890 https://generativelanguage.googleapis.com
-        if ($res -eq "404" -or $res -eq "200" -or $res -eq "403") {
-            Write-Host " [OK] Endpoint reachable ($res)" -ForegroundColor Green
-        } else {
-            Write-Host " [Code: $res]" -ForegroundColor Yellow
-        }
-    } catch {
-        Write-Host " [FAIL]" -ForegroundColor Red
-    }
-
-    Write-Host "3. Testing Direct Local Traffic (Yandex)..." -NoNewline
-    try {
-        $res = & curl.exe -s -o NUL -w "%{http_code}" -m 5 https://ya.ru
-        if ($res -eq "200" -or $res -eq "302") {
-            Write-Host " [OK] Direct without proxy ($res)" -ForegroundColor Green
-        } else {
-            Write-Host " [Code: $res]" -ForegroundColor Yellow
-        }
-    } catch {
-        Write-Host " [FAIL]" -ForegroundColor Red
-    }
-
-    Write-Host "4. Testing IP & Country (ipinfo.io)..." -NoNewline
-    try {
-        $ipJson = & curl.exe -s -m 7 -x http://127.0.0.1:7890 https://ipinfo.io
-        $ipObj = $ipJson | ConvertFrom-Json
-        if ($ipObj.country -eq "DE") {
-            Write-Host " [OK] IP: $($ipObj.ip), Country: $($ipObj.country) ($($ipObj.city))" -ForegroundColor Green
-        } else {
-            Write-Host " [NOTICE] Country: $($ipObj.country), IP: $($ipObj.ip)" -ForegroundColor Yellow
-        }
-    } catch {
-        Write-Host " [FAIL]" -ForegroundColor Red
-    }
-
-    Write-Host "5. Testing Telegram (https://t.me)..." -NoNewline
-    try {
-        $tgCode = & curl.exe -s -o NUL -w "%{http_code}" -m 7 -x http://127.0.0.1:7890 https://t.me
-        if ($tgCode -eq "200" -or $tgCode -eq "302") {
-            Write-Host " [OK] Telegram reachable ($tgCode)" -ForegroundColor Green
-        } else {
-            Write-Host " [Code: $tgCode]" -ForegroundColor Yellow
-        }
-    } catch {
-        Write-Host " [FAIL]" -ForegroundColor Red
+    if (Get-Command Invoke-ProksiFiDiagnostics -ErrorAction SilentlyContinue) {
+        Invoke-ProksiFiDiagnostics
     }
 }
 
 function Show-Logs {
-    $serviceLog = "$env:ProgramData\ProksiFi\logs\service.log"
-    if (-not (Test-Path $serviceLog)) {
-        $serviceLog = "$env:ProgramData\AntigravityBypass\logs\service.log"
+    $logDir = "$env:ProgramData\ProksiFi\logs"
+    if (-not (Test-Path $logDir)) {
+        $logDir = "$env:ProgramData\AntigravityBypass\logs"
     }
-    $errLog = "$env:ProgramData\ProksiFi\logs\service.err.log"
-    $installLog = "$env:ProgramData\ProksiFi\logs\install.log"
 
-    Write-Host "`n=== PROKSIFI SERVICE EVENT LOGS ($serviceLog) ===" -ForegroundColor Cyan
+    $serviceLog = Join-Path $logDir "service.log"
+    $errLog = Join-Path $logDir "service.err.log"
+
+    Write-Host "`n=== ЖУРНАЛ СОБЫТИЙ PROKSIFI ($serviceLog) ===" -ForegroundColor Cyan
     if (Test-Path $serviceLog) {
         if ($Follow) {
-            Write-Host "Streaming live logs (Press Ctrl+C to exit)..." -ForegroundColor Yellow
+            Write-Host "Трансляция логов в реальном времени (Ctrl+C для выхода)..." -ForegroundColor Yellow
             Get-Content -Path $serviceLog -Tail $Lines -Wait
         } else {
             $logLines = Get-Content -Path $serviceLog -Tail $Lines -Encoding UTF8 -ErrorAction SilentlyContinue
@@ -162,23 +125,56 @@ function Show-Logs {
             }
         }
     } else {
-        Write-Host "Service log file not created yet (service might not have run)." -ForegroundColor Yellow
+        Write-Host "Файл service.log пока пуст." -ForegroundColor Yellow
     }
 
     if (Test-Path $errLog) {
         $errContent = Get-Content -Path $errLog -Tail 15 -Encoding UTF8 -ErrorAction SilentlyContinue
         if ($errContent -and $errContent.Count -gt 0) {
-            Write-Host "`n=== СИСТЕМНЫЙ ЖУРНАЛ ОШИБОК ($errLog) ===" -ForegroundColor Red
+            Write-Host "`n=== ЖУРНАЛ ОШИБОК ($errLog) ===" -ForegroundColor Red
             foreach ($e in $errContent) {
                 Write-Host "  $e" -ForegroundColor Red
             }
         }
     }
+}
 
-    if (Test-Path $installLog) {
-        Write-Host "`n=== RECENT INSTALL LOGS ($installLog) ===" -ForegroundColor Cyan
-        Get-Content -Path $installLog -Tail 10 -Encoding UTF8 -ErrorAction SilentlyContinue
+function Invoke-QuickFix {
+    Write-Host "`n=== БЫСТРОЕ АВТОИСПРАВЛЕНИЕ СИСТЕМЫ И СЛУЖБЫ ===" -ForegroundColor Cyan
+    Write-Host "1. Остановка службы $serviceName..." -ForegroundColor Yellow
+    Stop-Service -Name $serviceName -Force -ErrorAction SilentlyContinue
+
+    Write-Host "2. Принудительное завершение конфликтующих процессов..." -ForegroundColor Yellow
+    & taskkill.exe /F /IM core.exe /T 2>&1 | Out-Null
+    $conflicts = Get-Process -Name "core", "mihomo" -ErrorAction SilentlyContinue
+    foreach ($cp in $conflicts) {
+        try { Stop-Process -Id $cp.Id -Force -ErrorAction SilentlyContinue } catch {}
     }
+
+    Write-Host "3. Сброс и очистка виртуального адаптера WinTun..." -ForegroundColor Yellow
+    try {
+        & netsh.exe interface ipv4 delete address name="ProksiFiTUN" addr=172.19.0.1 2>&1 | Out-Null
+        & netsh.exe interface ipv4 delete address name="AntigravityTUN" addr=172.19.0.1 2>&1 | Out-Null
+        Get-NetIPAddress -InterfaceAlias "ProksiFiTUN*", "AntigravityTUN*" -ErrorAction SilentlyContinue | Remove-NetIPAddress -Confirm:$false -ErrorAction SilentlyContinue
+    } catch {}
+
+    Write-Host "4. Восстановление переменной AG_LS_PROXY и системного прокси..." -ForegroundColor Yellow
+    $proxyOverride = "localhost;127.*;10.*;172.16.*;172.17.*;172.18.*;172.19.*;172.20.*;172.21.*;172.22.*;172.23.*;172.24.*;172.25.*;172.26.*;172.27.*;172.28.*;172.29.*;172.30.*;172.31.*;192.168.*;<local>;*.ru;*.su;*.xn--p1ai"
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "ProxyEnable" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "ProxyServer" -Value "127.0.0.1:7890" -Type String -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "ProxyOverride" -Value $proxyOverride -Type String -Force -ErrorAction SilentlyContinue
+
+    [Environment]::SetEnvironmentVariable("AG_LS_PROXY", "http://127.0.0.1:7890", "User")
+    [Environment]::SetEnvironmentVariable("AG_LS_PROXY", "http://127.0.0.1:7890", "Machine")
+    $env:AG_LS_PROXY = "http://127.0.0.1:7890"
+
+    Write-Host "5. Запуск службы $serviceName..." -ForegroundColor Yellow
+    Start-Sleep -Milliseconds 600
+    Start-Service -Name $serviceName -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 2
+
+    Show-Status
+    Write-Host "`n[OK] Быстрое восстановление выполнено успешно!" -ForegroundColor Green
 }
 
 switch ($Action) {
@@ -201,14 +197,45 @@ switch ($Action) {
         Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "ProxyEnable" -Value 0 -Type DWord -Force -ErrorAction SilentlyContinue
         [Environment]::SetEnvironmentVariable("AG_LS_PROXY", $null, "User")
         Stop-Service -Name $serviceName -Force
+        try {
+            & netsh.exe interface ipv4 delete address name="ProksiFiTUN" addr=172.19.0.1 2>&1 | Out-Null
+        } catch {}
         Show-Status
     }
     "restart" {
-        Restart-Service -Name $serviceName -Force
+        Stop-Service -Name $serviceName -Force -ErrorAction SilentlyContinue
+        & taskkill.exe /F /IM core.exe 2>&1 | Out-Null
+        try {
+            & netsh.exe interface ipv4 delete address name="ProksiFiTUN" addr=172.19.0.1 2>&1 | Out-Null
+            Get-NetIPAddress -InterfaceAlias "ProksiFiTUN*" -ErrorAction SilentlyContinue | Remove-NetIPAddress -Confirm:$false -ErrorAction SilentlyContinue
+        } catch {}
+        Start-Sleep -Milliseconds 600
+        Start-Service -Name $serviceName
         Show-Status
     }
+    "fix" {
+        Invoke-QuickFix
+    }
     "test" {
-        Test-ConnectionQuality
+        if (Get-Command Invoke-ProksiFiDiagnostics -ErrorAction SilentlyContinue) {
+            Invoke-ProksiFiDiagnostics
+        } else {
+            Write-Host "Модуль диагностики не найден." -ForegroundColor Red
+        }
+    }
+    "ag" {
+        if (Get-Command Invoke-ProksiFiDiagnostics -ErrorAction SilentlyContinue) {
+            Invoke-ProksiFiDiagnostics
+        } else {
+            Write-Host "Модуль диагностики не найден." -ForegroundColor Red
+        }
+    }
+    "upload" {
+        if (Get-Command Send-ProksiFiLogsToServer -ErrorAction SilentlyContinue) {
+            Send-ProksiFiLogsToServer -Interactive
+        } else {
+            Write-Host "Функция отправки логов не найдена." -ForegroundColor Red
+        }
     }
     "diag" {
         if (Get-Command Invoke-ProksiFiDiagnostics -ErrorAction SilentlyContinue) {
@@ -221,6 +248,6 @@ switch ($Action) {
         Show-Logs
     }
     "help" {
-        Write-Host "Usage: .\manage.ps1 [status|start|stop|restart|test|diag|info|logs]" -ForegroundColor Yellow
+        Write-Host "Использование: .\manage.ps1 [status|start|stop|restart|fix|test|ag|diag|upload|info|logs]" -ForegroundColor Yellow
     }
 }

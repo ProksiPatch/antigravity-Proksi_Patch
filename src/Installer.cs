@@ -32,10 +32,11 @@ namespace ProksiFiApp {
         private ToolStripMenuItem miInstall;
         private ToolStripMenuItem miEnable;
         private ToolStripMenuItem miDisable;
-        private ToolStripMenuItem miTest;
         private ToolStripMenuItem miRestart;
+        private ToolStripMenuItem miFix;
         private ToolStripSeparator sepActions;
         private ToolStripMenuItem miDiag;
+        private ToolStripMenuItem miSendLogs;
         private ToolStripMenuItem miLogs;
         private ToolStripSeparator sepLogs;
         private ToolStripMenuItem miUninstall;
@@ -131,17 +132,17 @@ namespace ProksiFiApp {
             miDisable.Click += (s, e) => RunSetupOperation("manage.ps1", "-Action stop", "Выключение обхода...");
             trayMenu.Items.Add(miDisable);
 
-            miTest = new ToolStripMenuItem("Тест подключения (Gemini, TG, IP)");
-            miTest.ForeColor = Color.FromArgb(240, 240, 240);
-            miTest.Padding = new Padding(12, 5, 12, 5);
-            miTest.Click += (s, e) => RunConsoleScript("manage.ps1", "-Action test");
-            trayMenu.Items.Add(miTest);
-
             miRestart = new ToolStripMenuItem("Перезапустить службу");
             miRestart.ForeColor = Color.FromArgb(240, 240, 240);
             miRestart.Padding = new Padding(12, 5, 12, 5);
             miRestart.Click += (s, e) => RunSetupOperation("manage.ps1", "-Action restart", "Перезапуск службы...");
             trayMenu.Items.Add(miRestart);
+
+            miFix = new ToolStripMenuItem("Быстрое автоисправление сети...");
+            miFix.ForeColor = Color.FromArgb(166, 227, 161);
+            miFix.Padding = new Padding(12, 5, 12, 5);
+            miFix.Click += (s, e) => RunSetupOperation("manage.ps1", "-Action fix", "Восстановление службы и сети...");
+            trayMenu.Items.Add(miFix);
 
             sepActions = new ToolStripSeparator();
             trayMenu.Items.Add(sepActions);
@@ -153,6 +154,13 @@ namespace ProksiFiApp {
             miDiag.Padding = new Padding(12, 5, 12, 5);
             miDiag.Click += (s, e) => RunConsoleScript("manage.ps1", "-Action diag");
             trayMenu.Items.Add(miDiag);
+
+            miSendLogs = new ToolStripMenuItem("📤 Отправить логи разработчику...");
+            miSendLogs.Font = new Font(trayMenu.Font.FontFamily, 9.25f, FontStyle.Bold);
+            miSendLogs.ForeColor = Color.FromArgb(250, 179, 135); // Warm Peach / Amber #fab387 (Prominent!)
+            miSendLogs.Padding = new Padding(12, 5, 12, 5);
+            miSendLogs.Click += (s, e) => RunConsoleScript("manage.ps1", "-Action upload");
+            trayMenu.Items.Add(miSendLogs);
 
             miLogs = new ToolStripMenuItem("Журнал событий (Логи)");
             miLogs.ForeColor = Color.FromArgb(240, 240, 240);
@@ -267,8 +275,8 @@ namespace ProksiFiApp {
             miEnable.Enabled = !isRunning && !isBusy;
             miDisable.Enabled = isRunning && !isBusy;
             miRestart.Enabled = installed && !isBusy;
-            miTest.Enabled = !isBusy;
             miDiag.Enabled = !isBusy;
+            miSendLogs.Enabled = !isBusy;
             miLogs.Enabled = !isBusy;
         }
 
@@ -488,9 +496,9 @@ namespace ProksiFiApp {
             miInstall.Enabled = enabled;
             miEnable.Enabled = enabled;
             miDisable.Enabled = enabled;
-            miTest.Enabled = enabled;
             miRestart.Enabled = enabled;
             miDiag.Enabled = enabled;
+            miSendLogs.Enabled = enabled;
             miLogs.Enabled = enabled;
             miUninstall.Enabled = enabled;
         }

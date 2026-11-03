@@ -6,6 +6,9 @@ cookie.txt
 *.pem
 
 # Developer Tools & Internal Docs (Private)
+admin/
+android/
+windows/
 tools/
 docs/
 Курсовая*.md
@@ -29,4 +32,3 @@ Thumbs.db
 .idea/
 *.suo
 *.user
-

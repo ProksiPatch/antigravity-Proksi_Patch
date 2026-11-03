@@ -74,10 +74,13 @@ Name: "{group}\Удалить {#MyAppName}"; Filename: "{uninstallexe}"
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "ProksiFi_Tray"; ValueData: """{app}\{#MyAppExeName}"""; Tasks: autostart; Flags: uninsdeletevalue
 
 [Run]
-; Шаг 1: Автоматическая установка и запуск службы ProksiFiService через install.ps1
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\install.ps1"""; StatusMsg: "Настройка и запуск службы ProksiFiService (Frankfurt VPS)..."; Flags: runhidden
+; Step 1: Background service configuration and start
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\install.ps1"""; WorkingDir: "{app}"; StatusMsg: "Настройка и запуск службы ProksiFi (Frankfurt VPS)..."; Flags: runhidden
 
-; Шаг 2: Запуск агента в системном трее Windows 11
+; Step 2: Automatic full diagnostics immediately after full setup
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\manage.ps1"" -Action diag"; WorkingDir: "{app}"; StatusMsg: "Выполнение полной проверки и диагностики системы..."; Flags: runascurrentuser skipifsilent
+
+; Step 3: Start Tray Agent
 Filename: "{app}\{#MyAppExeName}"; Description: "Запустить ProksiFi в системном трее"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallRun]

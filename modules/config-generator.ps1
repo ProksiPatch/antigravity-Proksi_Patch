@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Module: config-generator.ps1
 # Description: Generates optimal sing-box 1.14+ JSON configuration with gVisor TUN and Split Routing
 # ==============================================================================
@@ -210,7 +210,7 @@ function New-ProksiFiCoreConfig {
                 interface_name = "ProksiFiTUN"
                 address        = @("172.19.0.1/30")
                 auto_route     = $true
-                strict_route   = $true
+                strict_route   = $false
                 stack          = "gvisor"
             },
             @{
@@ -257,6 +257,14 @@ function New-ProksiFiCoreConfig {
             default_domain_resolver = "local-dns"
             auto_detect_interface   = $true
             rules                   = @(
+                @{
+                    process_name = @("core.exe", "service.exe")
+                    outbound     = "direct"
+                },
+                @{
+                    ip_cidr  = @("$ServerHost/32")
+                    outbound = "direct"
+                },
                 @{
                     process_name = $torrentProcesses
                     outbound     = "direct"
@@ -330,7 +338,7 @@ function New-ProksiFiCoreConfig {
     $json = $config | ConvertTo-Json -Depth 10
     
     $outDir = Split-Path -Path $OutputPath -Parent
-    if (-not (Test-Path $outDir)) {
+    if ($outDir -and -not (Test-Path $outDir)) {
         New-Item -ItemType Directory -Path $outDir -Force | Out-Null
     }
 
