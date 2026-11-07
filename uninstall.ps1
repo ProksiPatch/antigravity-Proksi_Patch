@@ -134,9 +134,10 @@ try {
     [Environment]::SetEnvironmentVariable("AG_LS_PROXY", $null, "Machine")
     Remove-Item Env:\AG_LS_PROXY -ErrorAction SilentlyContinue
 
-    # Удаление из автозапуска
+    # Удаление из автозапуска (реестр и Планировщик задач)
     Remove-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "ProksiFi_Tray" -Force -ErrorAction SilentlyContinue
     Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "ProksiFi_Tray" -Force -ErrorAction SilentlyContinue
+    & schtasks.exe /Delete /TN "ProksiFi_Tray_Autostart" /F 2>&1 | Out-Null
 
     # Очистка DNS кэша Windows
     & ipconfig.exe /flushdns 2>&1 | Out-Null
@@ -157,7 +158,9 @@ $shortcutPaths = @(
     "$env:USERPROFILE\Desktop\ProksiFi*.lnk"
 )
 foreach ($sp in $shortcutPaths) {
-    Get-Item -Path $sp -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    Get-Item -Path $sp -ErrorAction SilentlyContinue | Where-Object {
+        $_.Name -notmatch "Логи клиентов|LogExplorer"
+    } | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 }
 Write-Host "  [OK] Ярлыки удалены." -ForegroundColor Green
 

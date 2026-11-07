@@ -2,7 +2,7 @@
 # ProksiFi v2.0 - Service Management & Quick Repair Console
 # ==============================================================================
 param(
-    [ValidateSet("status", "start", "stop", "restart", "test", "ag", "info", "logs", "diag", "fix", "upload", "help")]
+    [ValidateSet("status", "start", "stop", "restart", "install", "test", "ag", "info", "logs", "diag", "fix", "upload", "help")]
     [string]$Action = "status",
     [int]$Lines = 30,
     [switch]$Follow
@@ -144,9 +144,9 @@ function Invoke-QuickFix {
     Write-Host "1. Остановка службы $serviceName..." -ForegroundColor Yellow
     Stop-Service -Name $serviceName -Force -ErrorAction SilentlyContinue
 
-    Write-Host "2. Принудительное завершение конфликтующих процессов..." -ForegroundColor Yellow
+    Write-Host "2. Принудительное завершение конфликтующих процессов и патчеров..." -ForegroundColor Yellow
     & taskkill.exe /F /IM core.exe /T 2>&1 | Out-Null
-    $conflicts = Get-Process -Name "core", "mihomo" -ErrorAction SilentlyContinue
+    $conflicts = Get-Process -Name "core", "mihomo", "ag_dns", "AG_Unlocker", "AG_2.26.0", "ag_proxy", "happd", "HappProxy", "HiddifyCli" -ErrorAction SilentlyContinue
     foreach ($cp in $conflicts) {
         try { Stop-Process -Id $cp.Id -Force -ErrorAction SilentlyContinue } catch {}
     }
@@ -167,6 +167,15 @@ function Invoke-QuickFix {
     [Environment]::SetEnvironmentVariable("AG_LS_PROXY", "http://127.0.0.1:7890", "User")
     [Environment]::SetEnvironmentVariable("AG_LS_PROXY", "http://127.0.0.1:7890", "Machine")
     $env:AG_LS_PROXY = "http://127.0.0.1:7890"
+
+    # Перезапуск языкового сервера Antigravity, чтобы он сразу подхватил порт 7890
+    $lsProcs = Get-Process -Name "language_server" -ErrorAction SilentlyContinue
+    if ($lsProcs) {
+        Write-Host "   -> Перезапуск процесса language_server.exe для применения прокси 7890..." -ForegroundColor Gray
+        foreach ($lsp in $lsProcs) {
+            try { Stop-Process -Id $lsp.Id -Force -ErrorAction SilentlyContinue } catch {}
+        }
+    }
 
     Write-Host "5. Запуск службы $serviceName..." -ForegroundColor Yellow
     Start-Sleep -Milliseconds 600
@@ -190,12 +199,14 @@ switch ($Action) {
         Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "ProxyServer" -Value "127.0.0.1:7890" -Type String -Force -ErrorAction SilentlyContinue
         Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "ProxyOverride" -Value $proxyOverride -Type String -Force -ErrorAction SilentlyContinue
         [Environment]::SetEnvironmentVariable("AG_LS_PROXY", "http://127.0.0.1:7890", "User")
+        [Environment]::SetEnvironmentVariable("AG_LS_PROXY", "http://127.0.0.1:7890", "Machine")
         Start-Service -Name $serviceName
         Show-Status
     }
     "stop" {
         Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name "ProxyEnable" -Value 0 -Type DWord -Force -ErrorAction SilentlyContinue
         [Environment]::SetEnvironmentVariable("AG_LS_PROXY", $null, "User")
+        [Environment]::SetEnvironmentVariable("AG_LS_PROXY", $null, "Machine")
         Stop-Service -Name $serviceName -Force
         try {
             & netsh.exe interface ipv4 delete address name="ProksiFiTUN" addr=172.19.0.1 2>&1 | Out-Null
@@ -212,6 +223,14 @@ switch ($Action) {
         Start-Sleep -Milliseconds 600
         Start-Service -Name $serviceName
         Show-Status
+    }
+    "install" {
+        $instScript = Join-Path $ScriptDir "install.ps1"
+        if (Test-Path $instScript) {
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $instScript
+        } else {
+            Write-Host "Скрипт установки install.ps1 не найден в $ScriptDir." -ForegroundColor Red
+        }
     }
     "fix" {
         Invoke-QuickFix
@@ -232,7 +251,7 @@ switch ($Action) {
     }
     "upload" {
         if (Get-Command Send-ProksiFiLogsToServer -ErrorAction SilentlyContinue) {
-            Send-ProksiFiLogsToServer -Interactive
+            $null = Send-ProksiFiLogsToServer -Interactive
         } else {
             Write-Host "Функция отправки логов не найдена." -ForegroundColor Red
         }

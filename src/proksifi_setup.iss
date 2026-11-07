@@ -75,13 +75,13 @@ Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 
 [Run]
 ; Step 1: Background service configuration and start
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\install.ps1"""; WorkingDir: "{app}"; StatusMsg: "Настройка и запуск службы ProksiFi (Frankfurt VPS)..."; Flags: runhidden
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\install.ps1"""; WorkingDir: "{app}"; StatusMsg: "Настройка и запуск службы ProksiFi (Madrid VPS)..."; Flags: runhidden
 
 ; Step 2: Automatic full diagnostics immediately after full setup
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\manage.ps1"" -Action diag"; WorkingDir: "{app}"; StatusMsg: "Выполнение полной проверки и диагностики системы..."; Flags: runascurrentuser skipifsilent
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\manage.ps1"" -Action diag"; WorkingDir: "{app}"; StatusMsg: "Выполнение полной проверки и диагностики системы..."; Flags: skipifsilent
 
 ; Step 3: Start Tray Agent
-Filename: "{app}\{#MyAppExeName}"; Description: "Запустить ProksiFi в системном трее"; Flags: nowait postinstall skipifsilent runascurrentuser
+Filename: "{app}\{#MyAppExeName}"; Description: "Запустить ProksiFi в системном трее"; Flags: nowait postinstall skipifsilent shellexec
 
 [UninstallRun]
 ; Остановка и удаление перед деинсталляцией

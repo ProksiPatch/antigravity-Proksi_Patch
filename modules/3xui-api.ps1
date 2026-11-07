@@ -16,14 +16,14 @@ function Invoke-3XUILogin {
     $rootUrl = "$PanelUrl$BasePath/"
     $loginUrl = "$PanelUrl$BasePath/login"
 
-    $htmlOutput = (& curl.exe -s -c "$CookieFile" -m 10 $rootUrl) -join "`n"
+    $htmlOutput = (& curl.exe --noproxy "*" -s -c "$CookieFile" -m 10 $rootUrl) -join "`n"
     $m = [regex]::Match($htmlOutput, 'name="csrf-token" content="([^"]+)"')
     if (-not $m.Success) {
         throw "Failed to extract CSRF token from $rootUrl"
     }
     $csrfToken = $m.Groups[1].Value
 
-    $loginResponse = & curl.exe -s -b "$CookieFile" -c "$CookieFile" -X POST $loginUrl `
+    $loginResponse = & curl.exe --noproxy "*" -s -b "$CookieFile" -c "$CookieFile" -X POST $loginUrl `
         -H "Content-Type: application/x-www-form-urlencoded" `
         -H "X-CSRF-Token: $csrfToken" `
         -H "Referer: $rootUrl" `
@@ -52,7 +52,7 @@ function Get-3XUIInbounds {
     )
 
     $listUrl = "$($Session.PanelUrl)$($Session.BasePath)/panel/api/inbounds/list"
-    $response = & curl.exe -s -b "$($Session.CookieFile)" -m 10 $listUrl
+    $response = & curl.exe --noproxy "*" -s -b "$($Session.CookieFile)" -m 10 $listUrl
     $json = $response | ConvertFrom-Json
     if (-not $json.success) {
         throw "Failed to fetch inbounds: $($json.msg)"
@@ -91,7 +91,7 @@ function Get-OrCreateInboundClient {
 
     # Fetch latest inbound data directly from server
     $getUrl = "$($Session.PanelUrl)$($Session.BasePath)/panel/api/inbounds/get/$($Inbound.id)"
-    $getResp = & curl.exe -s -b "$($Session.CookieFile)" $getUrl
+    $getResp = & curl.exe --noproxy "*" -s -b "$($Session.CookieFile)" $getUrl
     $freshInbound = ($getResp | ConvertFrom-Json).obj
     if (-not $freshInbound) {
         $freshInbound = $Inbound
@@ -157,7 +157,7 @@ function Get-OrCreateInboundClient {
 
     $updateUrl = "$($Session.PanelUrl)$($Session.BasePath)/panel/api/inbounds/update/$($Inbound.id)"
     try {
-        $updateResp = & curl.exe -s -b "$($Session.CookieFile)" -c "$($Session.CookieFile)" -X POST $updateUrl `
+        $updateResp = & curl.exe --noproxy "*" -s -b "$($Session.CookieFile)" -c "$($Session.CookieFile)" -X POST $updateUrl `
             -H "Content-Type: application/json" `
             -H "X-CSRF-Token: $($Session.CsrfToken)" `
             --data-binary "@$tempBodyFile" `

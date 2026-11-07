@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -275,6 +275,7 @@ namespace ProksiFiApp {
             miEnable.Enabled = !isRunning && !isBusy;
             miDisable.Enabled = isRunning && !isBusy;
             miRestart.Enabled = installed && !isBusy;
+            miFix.Enabled = installed && !isBusy;
             miDiag.Enabled = !isBusy;
             miSendLogs.Enabled = !isBusy;
             miLogs.Enabled = !isBusy;
@@ -497,6 +498,7 @@ namespace ProksiFiApp {
             miEnable.Enabled = enabled;
             miDisable.Enabled = enabled;
             miRestart.Enabled = enabled;
+            miFix.Enabled = enabled;
             miDiag.Enabled = enabled;
             miSendLogs.Enabled = enabled;
             miLogs.Enabled = enabled;

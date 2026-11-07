@@ -6,7 +6,7 @@
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "[UAC] Запрос прав Администратора Windows..." -ForegroundColor Yellow
-    Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"") -Verb RunAs
+    Start-Process powershell.exe -ArgumentList ("-NoExit -NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"") -Verb RunAs
     exit
 }
 
@@ -60,14 +60,15 @@ $serverConfig = Get-Content -Path $serverConfigFile -Raw -Encoding UTF8 | Conver
 # -----------------------------------------------------------------------------
 Write-Log "`n[1/7] Умное сканирование среды и проверка на конфликты..." "Yellow"
 
-$conflictProcesses = Get-Process -Name "ag_dns", "AG_Unlocker", "AG_2.26.0", "goodbyedpi", "zapret", "winws", "clash", "mihomo", "clash-verge", "v2rayN", "nekoray", "amnezia-vpn", "hiddify" -ErrorAction SilentlyContinue
+$conflictProcesses = Get-Process -Name "ag_dns", "AG_Unlocker", "AG_2.26.0", "ag_proxy", "happd", "HappProxy", "HiddifyCli", "hiddify-next", "goodbyedpi", "zapret", "winws", "clash", "mihomo", "clash-verge", "v2rayN", "nekoray", "amnezia-vpn", "hiddify" -ErrorAction SilentlyContinue
 if ($conflictProcesses) {
     foreach ($cp in $conflictProcesses) {
-        if ($cp.Name -match "ag_dns|AG_") {
-            Write-Log "  [ВНИМАНИЕ] Обнаружен сторонний патчер '$($cp.Name)' (PID $($cp.Id))!" "Yellow"
+        if ($cp.Name -match "ag_dns|AG_|ag_proxy") {
+            Write-Log "  [ВНИМАНИЕ] Обнаружен сторонний патчер '$($cp.Name)' (PID $($cp.Id))! Останавливаем..." "Yellow"
+            Stop-Process -Id $cp.Id -Force -ErrorAction SilentlyContinue
             Write-Log "  ProksiFi автоматически заменит его и настроит правильный адрес прокси для Antigravity." "Cyan"
-        } elseif ($cp.Name -match "mihomo|clash") {
-            Write-Log "  [КОНФЛИКТ] Процесс '$($cp.Name)' (PID $($cp.Id)) может блокировать порт 7890. Завершаем..." "Yellow"
+        } elseif ($cp.Name -match "mihomo|clash|happd|HappProxy|HiddifyCli|hiddify") {
+            Write-Log "  [КОНФЛИКТ] Процесс '$($cp.Name)' (PID $($cp.Id)) может блокировать порт 7890 или перехватывать сеть. Завершаем..." "Yellow"
             Stop-Process -Id $cp.Id -Force -ErrorAction SilentlyContinue
         } else {
             Write-Log "  [ПРЕДУПРЕЖДЕНИЕ] Обнаружена посторонняя сетевая утилита '$($cp.Name)' (PID $($cp.Id))." "Yellow"
@@ -151,6 +152,13 @@ if ($savedProfile -and $savedProfile.UUID -and $savedProfile.InboundId -eq $serv
     Write-Log "  Ключ сохранен, создание дубликата в панели не требуется!" "Green"
     $clientUUID = $savedProfile.UUID
     $realityParams = $savedProfile.Reality
+    $targetHost = ([uri]$serverConfig.panel_url).Host
+    if ($realityParams.ServerHost -ne $targetHost) {
+        Write-Log "  [ОБНОВЛЕНИЕ] Переключение сервера в профиле: $($realityParams.ServerHost) -> $targetHost" "Cyan"
+        $realityParams.ServerHost = $targetHost
+        $savedProfile.Reality = $realityParams
+        Save-DeviceProfile -Profile $savedProfile
+    }
 } else {
     Write-Log "  [3X-UI] Проверка/создание клиента в панели 3X-UI..." "Yellow"
     $tempDir = "$dataDir\temp"
@@ -299,6 +307,14 @@ Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet
 [Environment]::SetEnvironmentVariable("AG_LS_PROXY", "http://127.0.0.1:7890", "Machine")
 $env:AG_LS_PROXY = "http://127.0.0.1:7890"
 
+# Перезапуск языкового сервера Antigravity (если открыт), чтобы он сразу применил порт 7890
+$lsRunning = Get-Process -Name "language_server" -ErrorAction SilentlyContinue
+if ($lsRunning) {
+    foreach ($lsp in $lsRunning) {
+        try { Stop-Process -Id $lsp.Id -Force -ErrorAction SilentlyContinue } catch {}
+    }
+}
+
 Write-Log "  [OK] Системный прокси и AG_LS_PROXY настроены на http://127.0.0.1:7890." "Green"
 Write-Log "  [OK] Протокол QUIC отключен в Chrome, Edge и Яндекс.Браузере." "Green"
 
@@ -341,6 +357,19 @@ Start-Sleep -Milliseconds 400
 $installOut = & "$programDir\service.exe" install 2>&1
 Write-Log "  $installOut" "Gray"
 & sc.exe config $serviceName start= auto 2>&1 | Out-Null
+
+# Настройка надежного автозапуска агента трея через Планировщик задач (обход блокировки UAC для requireAdministrator)
+if (Test-Path "$programDir\ProksiFi_Tray.exe") {
+    try {
+        $action = New-ScheduledTaskAction -Execute "$programDir\ProksiFi_Tray.exe"
+        $trigger = New-ScheduledTaskTrigger -AtLogOn
+        $principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Users" -RunLevel Highest
+        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+        Register-ScheduledTask -TaskName "ProksiFi_Tray_Autostart" -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Force -ErrorAction Stop | Out-Null
+    } catch {
+        cmd.exe /c "schtasks /Create /TN ProksiFi_Tray_Autostart /TR \"\"\"$programDir\ProksiFi_Tray.exe\"\"\" /SC ONLOGON /RL HIGHEST /F" 2>&1 | Out-Null
+    }
+}
 
 $startOut = & "$programDir\service.exe" start 2>&1
 Write-Log "  $startOut" "Gray"

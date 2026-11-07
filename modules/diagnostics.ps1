@@ -182,14 +182,40 @@ function Test-ThirdPartyConflicts {
     }
 
     # 3. Third-party Proxies & VPNs
-    $vpnTools = Get-Process -Name "clash", "mihomo", "clash-verge", "clash-meta", "v2rayN", "v2ray", "nekoray", "nekobox", "amnezia-vpn", "amnezia", "hiddify", "shadowsocks" -ErrorAction SilentlyContinue
+    $vpnTools = Get-Process -Name "clash", "mihomo", "clash-verge", "clash-meta", "v2rayN", "v2ray", "nekoray", "nekobox", `
+        "amnezia-vpn", "amnezia", "hiddify", "HiddifyCli", "hiddify-next", "shadowsocks", "sslocal", "ss-local", `
+        "happd", "HappProxy", "happ", "outline-client", "OutlineService", `
+        "lantern", "psiphon", "psiphon3", "xray", "sing-box", "hysteria" -ErrorAction SilentlyContinue
     foreach ($p in $vpnTools) {
+        # Определяем читаемое имя известных программ
+        $friendlyName = switch -Wildcard ($p.Name.ToLower()) {
+            "happd"         { "Happ Proxy" }
+            "happproxy"     { "Happ Proxy" }
+            "happ"          { "Happ Proxy" }
+            "hiddifycli"    { "Hiddify" }
+            "hiddify*"      { "Hiddify" }
+            "outline*"      { "Outline VPN" }
+            "lantern"       { "Lantern VPN" }
+            "psiphon*"      { "Psiphon VPN" }
+            "clash*"        { "Clash" }
+            "mihomo"        { "Mihomo/Clash.Meta" }
+            "nekoray"       { "Nekoray" }
+            "nekobox"       { "Nekobox" }
+            "v2ray*"        { "v2rayN" }
+            "amnezia*"      { "AmneziaVPN" }
+            "shadowsocks"   { "Shadowsocks" }
+            "sslocal"       { "Shadowsocks" }
+            "xray"          { "Xray-core" }
+            "sing-box"      { "sing-box" }
+            "hysteria"      { "Hysteria" }
+            default         { $p.Name }
+        }
         $conflicts += [PSCustomObject]@{
             Type     = "CRITICAL"
-            Category = "Сторонний VPN/Прокси"
+            Category = "Сторонний VPN/Прокси ($friendlyName)"
             Process  = "$($p.Name).exe (PID: $($p.Id))"
-            Impact   = "Может занимать порт 7890 или перехватывать системный прокси Windows."
-            Fix      = "Закройте '$($p.Name)' во избежание конфликта портов и двойной маршрутизации."
+            Impact   = "Занимает порт 7890 или системный прокси Windows — соединение ProksiFi обрывается (HTTP 000)."
+            Fix      = "Закройте '$friendlyName' во избежание конфликта портов. ProksiFi обеспечивает полный обход самостоятельно."
         }
     }
 
@@ -278,6 +304,7 @@ function Get-AntigravityProducts {
     # 3. Antigravity CLI (agy)
     $cliCandidates = @(
         "$env:USERPROFILE\.gemini\bin\agy.exe",
+        "$env:LOCALAPPDATA\agy\bin\agy.exe",
         "C:\Program Files\agy\agy.exe",
         "$env:LOCALAPPDATA\Programs\antigravity\resources\bin\agy.exe"
     )
@@ -441,7 +468,7 @@ function Send-ProksiFiLogsToServer {
     param(
         [switch]$Interactive,
         [string]$DiagnosticSummary = "",
-        [string]$ServerEndpoint = "http://130.17.6.138:7979/api/upload-log"
+        [string]$ServerEndpoint = "http://138.124.62.86:7979/api/upload-log"
     )
 
     Write-Host "`n══════════════════════════════════════════════════════════════════════" -ForegroundColor Cyan
@@ -550,12 +577,13 @@ function Send-ProksiFiLogsToServer {
 
     $tempJson = Join-Path $env:TEMP "proksifi_report_$([guid]::NewGuid().ToString('N')).json"
     $payloadJson = $payloadObj | ConvertTo-Json -Depth 5
-    [System.IO.File]::WriteAllText($tempJson, $payloadJson, [System.Text.Encoding]::UTF8)
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($tempJson, $payloadJson, $utf8NoBom)
 
     Write-Host "  -> Отправка пакета на сервер разработчика..." -ForegroundColor Cyan
 
     try {
-        $resp = & curl.exe -s -m 12 -X POST -H "Content-Type: application/json; charset=utf-8" --data-binary "@$tempJson" $ServerEndpoint 2>&1
+        $resp = (& curl.exe --noproxy "*" -s -m 15 -X POST -H "Content-Type: application/json; charset=utf-8" --data-binary "@$tempJson" $ServerEndpoint 2>&1) -join "`n"
         Remove-Item -LiteralPath $tempJson -Force -ErrorAction SilentlyContinue
 
         if ($resp -match '"success":\s*true' -or $resp -match 'Отчет успешно') {
@@ -563,6 +591,9 @@ function Send-ProksiFiLogsToServer {
             Write-Host "       Ваша личная папка на сервере: $email" -ForegroundColor Green
             Write-Host "       Разработчик сможет изучить логи и помочь с решением." -ForegroundColor Cyan
             return $true
+        } elseif ([string]::IsNullOrWhiteSpace($resp)) {
+            Write-Host "  [!] Сервер не ответил (проверьте интернет или закройте сторонние VPN/прокси, блокирующие сеть)." -ForegroundColor Yellow
+            return $false
         } else {
             Write-Host "  [!] Ответ сервера: $resp" -ForegroundColor Yellow
             return $false
@@ -794,58 +825,63 @@ function Invoke-ProksiFiDiagnostics {
     Write-Host "[6/6] ЭКСПРЕСС-ПРОВЕРКА ДРУГИХ СЕРВИСОВ ОБХОДА И МАРШРУТИЗАЦИИ:" -ForegroundColor Yellow
 
     # ChatGPT Web
+    $resChatGpt = "000"
     Write-Host "  1. ChatGPT (https://chatgpt.com)..." -NoNewline
     try {
-        $res = & curl.exe -s -o NUL -w "%{http_code}" -m 6 -x http://127.0.0.1:7890 -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130.0.0.0" https://chatgpt.com
-        if ($res -eq "200" -or $res -eq "307" -or $res -eq "403") {
-            Write-Host " [OK] Доступен (HTTP $res)" -ForegroundColor Green
+        $resChatGpt = & curl.exe -s -o NUL -w "%{http_code}" -m 6 -x http://127.0.0.1:7890 -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130.0.0.0" https://chatgpt.com
+        if ($resChatGpt -eq "200" -or $resChatGpt -eq "307" -or $resChatGpt -eq "403") {
+            Write-Host " [OK] Доступен (HTTP $resChatGpt)" -ForegroundColor Green
         } else {
-            Write-Host " [HTTP $res]" -ForegroundColor Yellow
+            Write-Host " [HTTP $resChatGpt]" -ForegroundColor Yellow
         }
     } catch {
         Write-Host " [FAIL]" -ForegroundColor Red
     }
 
     # SoundCloud
+    $resSoundCloud = "000"
     Write-Host "  2. SoundCloud (https://soundcloud.com)..." -NoNewline
     try {
-        $res = & curl.exe -s -o NUL -w "%{http_code}" -m 6 -x http://127.0.0.1:7890 https://soundcloud.com
-        if ($res -eq "200" -or $res -eq "301" -or $res -eq "302") {
-            Write-Host " [OK] (HTTP $res)" -ForegroundColor Green
+        $resSoundCloud = & curl.exe -s -o NUL -w "%{http_code}" -m 6 -x http://127.0.0.1:7890 https://soundcloud.com
+        if ($resSoundCloud -eq "200" -or $resSoundCloud -eq "301" -or $resSoundCloud -eq "302") {
+            Write-Host " [OK] (HTTP $resSoundCloud)" -ForegroundColor Green
         } else {
-            Write-Host " [HTTP $res]" -ForegroundColor Yellow
+            Write-Host " [HTTP $resSoundCloud]" -ForegroundColor Yellow
         }
     } catch {
         Write-Host " [FAIL]" -ForegroundColor Red
     }
 
     # Telegram
+    $resTelegram = "000"
     Write-Host "  3. Telegram (https://t.me)..." -NoNewline
     try {
-        $res = & curl.exe -s -o NUL -w "%{http_code}" -m 6 -x http://127.0.0.1:7890 https://t.me
-        if ($res -eq "200" -or $res -eq "302") {
-            Write-Host " [OK] (HTTP $res)" -ForegroundColor Green
+        $resTelegram = & curl.exe -s -o NUL -w "%{http_code}" -m 6 -x http://127.0.0.1:7890 https://t.me
+        if ($resTelegram -eq "200" -or $resTelegram -eq "302") {
+            Write-Host " [OK] (HTTP $resTelegram)" -ForegroundColor Green
         } else {
-            Write-Host " [HTTP $res]" -ForegroundColor Yellow
+            Write-Host " [HTTP $resTelegram]" -ForegroundColor Yellow
         }
     } catch {
         Write-Host " [FAIL]" -ForegroundColor Red
     }
 
     # Yandex Direct
+    $resYa = "000"
     Write-Host "  4. Прямой российский трафик (ya.ru)..." -NoNewline
     try {
-        $res = & curl.exe -s -o NUL -w "%{http_code}" -m 5 https://ya.ru
-        if ($res -eq "200" -or $res -eq "302") {
+        $resYa = & curl.exe -s -o NUL -w "%{http_code}" -m 5 https://ya.ru
+        if ($resYa -eq "200" -or $resYa -eq "302") {
             Write-Host " [OK] (Direct без прокси)" -ForegroundColor Green
         } else {
-            Write-Host " [HTTP $res]" -ForegroundColor Yellow
+            Write-Host " [HTTP $resYa]" -ForegroundColor Yellow
         }
     } catch {
         Write-Host " [FAIL]" -ForegroundColor Red
     }
 
     # IP & Country
+    $ipObj = $null
     Write-Host "  5. Проверка геопозиции (ipinfo.io)..." -NoNewline
     try {
         $ipJson = & curl.exe -s -m 6 -x http://127.0.0.1:7890 https://ipinfo.io
@@ -864,35 +900,15 @@ function Invoke-ProksiFiDiagnostics {
     Write-Host "======================================================================" -ForegroundColor Cyan
 
     # -------------------------------------------------------------------------
-    # 7. ИНТЕРАКТИВНЫЙ ЭКСПОРТ ЖУРНАЛОВ НА РАБОЧИЙ СТОЛ
+    # 7. ФОРМИРОВАНИЕ ПОЛНОГО ОТЧЕТА И ИНТЕРАКТИВНЫЙ ЭКСПОРТ
     # -------------------------------------------------------------------------
     $desktopPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop)
     if (-not $desktopPath -or -not (Test-Path $desktopPath)) {
         $desktopPath = "$env:USERPROFILE\Desktop"
     }
 
-    $createdFolder = $null
-
-    Write-Host ""
-    Write-Host "══════════════════════════════════════════════════════════════════════" -ForegroundColor Cyan
-    Write-Host "                СОХРАНЕНИЕ ОТЧЕТОВ И ЖУРНАЛОВ ЛОГОВ                   " -ForegroundColor Cyan
-    Write-Host "══════════════════════════════════════════════════════════════════════" -ForegroundColor Cyan
-    Write-Host ""
-
-    # Запрос 1: Сохранение отчета диагностики и логов ProksiFi
-    $saveProksiAns = Read-Host "Сохранить журнал логов на рабочий стол? (д/н или y/n)"
-    if ($saveProksiAns -match '^(д|да|y|yes|d)$' -or $saveProksiAns -match '^[дyYdD]') {
-        $timestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
-        $targetDir = Join-Path $desktopPath "ProksiFi_Logs_$timestamp"
-        $createdFolder = $targetDir
-
-        try {
-            New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
-            Write-Host "  -> Создана папка: $targetDir" -ForegroundColor Cyan
-
-            # 1. Формирование подробного текстового отчета
-            $reportPath = Join-Path $targetDir "Diagnostic_Report.txt"
-            $reportContent = @"
+    # Формируем полный отчет заранее, чтобы он всегда отправлялся на сервер полностью
+    $reportContent = @"
 ======================================================================
      PROKSIFI v2.0 — ПОЛНЫЙ ОТЧЕТ ДИАГНОСТИКИ И АНАЛИЗА СИСТЕМЫ
 ======================================================================
@@ -944,13 +960,35 @@ $(if ($detectedErrors.Count -eq 0) { "  Критических сетевых с
 ----------------------------------------------------------------------
 6. ДОСТУПНОСТЬ ДРУГИХ СЕРВИСОВ ОБХОДА
 ----------------------------------------------------------------------
-  ChatGPT:    $(if ($res -eq "200" -or $res -eq "307" -or $res -eq "403") { "OK" } else { "HTTP $res" })
-  SoundCloud: $(if ($res -eq "200" -or $res -eq "301" -or $res -eq "302") { "OK" } else { "HTTP $res" })
-  Telegram:   OK
-  Россия:     Прямой доступ (Direct ya.ru)
-  Геопозиция: $(if ($ipObj) { "$($ipObj.ip), $($ipObj.city) ($($ipObj.country))" } else { "Не определено" })
+  ChatGPT:    $(if ($resChatGpt -eq "200" -or $resChatGpt -eq "307" -or $resChatGpt -eq "403") { "OK (HTTP $resChatGpt)" } else { "HTTP $resChatGpt" })
+  SoundCloud: $(if ($resSoundCloud -eq "200" -or $resSoundCloud -eq "301" -or $resSoundCloud -eq "302") { "OK (HTTP $resSoundCloud)" } else { "HTTP $resSoundCloud" })
+  Telegram:   $(if ($resTelegram -eq "200" -or $resTelegram -eq "302") { "OK (HTTP $resTelegram)" } else { "HTTP $resTelegram" })
+  Россия:     $(if ($resYa -eq "200" -or $resYa -eq "302") { "Прямой доступ OK (HTTP $resYa)" } else { "HTTP $resYa" })
+  Геопозиция: $(if ($ipObj -and $ipObj.ip) { "$($ipObj.ip), $($ipObj.city) ($($ipObj.country))" } else { "Не определено" })
 ======================================================================
 "@
+
+    $createdFolder = $null
+
+    Write-Host ""
+    Write-Host "══════════════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host "                СОХРАНЕНИЕ ОТЧЕТОВ И ЖУРНАЛОВ ЛОГОВ                   " -ForegroundColor Cyan
+    Write-Host "══════════════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+    Write-Host ""
+
+    # Запрос 1: Сохранение отчета диагностики и логов ProksiFi
+    $saveProksiAns = Read-Host "Сохранить журнал логов на рабочий стол? (д/н или y/n)"
+    if ($saveProksiAns -match '^(д|да|y|yes|d)$' -or $saveProksiAns -match '^[дyYdD]') {
+        $timestamp = (Get-Date).ToString("yyyyMMdd_HHmmss")
+        $targetDir = Join-Path $desktopPath "ProksiFi_Logs_$timestamp"
+        $createdFolder = $targetDir
+
+        try {
+            New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+            Write-Host "  -> Создана папка: $targetDir" -ForegroundColor Cyan
+
+            # 1. Сохранение подробного текстового отчета
+            $reportPath = Join-Path $targetDir "Diagnostic_Report.txt"
             Set-Content -Path $reportPath -Value $reportContent -Encoding UTF8
 
             # 2. Копирование файлов логов ProksiFi
@@ -1071,7 +1109,7 @@ $(if ($detectedErrors.Count -eq 0) { "  Критических сетевых с
     } catch { }
 
     if ($sendDevAns -match '^[yYдДdD]' -or $sendDevAns -match '^(да|yes|da)$') {
-        Send-ProksiFiLogsToServer -DiagnosticSummary $reportContent
+        $null = Send-ProksiFiLogsToServer -DiagnosticSummary $reportContent
     } else {
         Write-Host "  [ПРОПУЩЕНО] Отправка логов разработчику отменена пользователем." -ForegroundColor Gray
     }
